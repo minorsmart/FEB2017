@@ -1,2 +1,2 @@
 # FEB2017
-Dit is de repository voor de HAN Minor Smart Industry
+Dit is de algemene repository voor de HAN Minor Smart Industry
