@@ -1,0 +1,32 @@
+---
+title: "Oefening read & analyze"
+output: html_notebook
+---
+
+In deze handleiding leer je een bestand in te lezen en te analyseren. De dataste komt van [Liander](https://www.liander.nl/over-liander/innovatie/open-data/data).
+
+Lees eerst de data in. Let op: dit is een groot bestand (300MB+). Het kan even duren voordat alle records zijn ingelezen. De data wordt in een data frame `energieDF` opgeslagen.
+
+```{r}
+energieDF <- read.csv("https://s3-eu-west-1.amazonaws.com/witex-files/nederland.csv")
+
+```
+
+Bekijk de eerste paar records met de `head()` functie.
+
+```{r}
+head(energieDF, 10)
+```
+
+Onderzoek de structuur met de `str()` functie.
+
+```{r}
+str(energieDF)
+```
+
+Bekijk de kwaliteit van de data met de `summary()` functie.
+
+```{r}
+summary(energieDF)
+```
+
