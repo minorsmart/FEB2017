@@ -1,6 +1,8 @@
 ---
 title: "Oefening read & analyze"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
 ---
 
 In deze handleiding leer je een bestand in te lezen en te analyseren. De dataste komt van [Liander](https://www.liander.nl/over-liander/innovatie/open-data/data).
@@ -9,7 +11,6 @@ Lees eerst de data in. Let op: dit is een groot bestand (300MB+). Het kan even d
 
 ```{r}
 energieDF <- read.csv("https://s3-eu-west-1.amazonaws.com/witex-files/nederland.csv")
-
 ```
 
 Bekijk de eerste paar records met de `head()` functie.
