@@ -16,26 +16,6 @@ Using the `dplyr` package some columns holding geo data in proper format and lev
 
 ```r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 pipelineDF <- mutate(pipelineDF,
                      LatLong = paste0(Accident.Latitude,":", Accident.Longitude),
                      Fire = as.numeric(Liquid.Ignition) + as.numeric(Liquid.Explosion)
@@ -44,4 +24,16 @@ pipelineDF <- mutate(pipelineDF,
 Finally the map is created and plotted.
  
 
+```r
+library(googleVis)
+pipelinesMap <- gvisGeoChart(pipelineDF, 'LatLong', 
+                          sizevar='All.Costs',
+                          colorvar='Fire',
+                          options=list( region="US",
+                                        width = 1000, heigth = 800,
+                                        colorAxis="{colors:[\'yellow',\'red']}"
+                                        )
+                          )
+plot(pipelinesMap)
+```
 

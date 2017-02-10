@@ -11,13 +11,13 @@ This is an example on reading data in from an online CSV file. The data is prepa
 
 First the online data file is read in.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 pipelineDF <- read.csv("https://raw.githubusercontent.com/minorsmart/FEB2017/master/Witek/Pipelines/database.csv")
 ```
 
 Using the `dplyr` package some columns holding geo data in proper format and level of fire (no fire, ignition, explosion) are added.
 
-```{r}
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 library(dplyr)
 pipelineDF <- mutate(pipelineDF,
                      LatLong = paste0(Accident.Latitude,":", Accident.Longitude),
@@ -26,7 +26,7 @@ pipelineDF <- mutate(pipelineDF,
 ```
 Finally the map is created and plotted.
  
-```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+```{r, echo=TRUE, message=FALSE, warning=FALSE, results='asis'}
 library(googleVis)
 pipelinesMap <- gvisGeoChart(pipelineDF, 'LatLong', 
                           sizevar='All.Costs',
