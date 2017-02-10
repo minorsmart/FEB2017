@@ -38,3 +38,5 @@ pipelinesMap <- gvisGeoChart(pipelineDF, 'LatLong',
 plot(pipelinesMap)
 ```
 
+![](map.png)
+
