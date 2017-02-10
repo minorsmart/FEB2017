@@ -2,7 +2,8 @@
 Witek ten Hove  
 2/10/2017  
 
-This is an example on reading data in from an online CSV file. The data is prepared and visualised using Google visualization widgets.
+
+This is an example on reading data in from an online CSV file. The data source comes from [Kaggle](https://www.kaggle.com/). The data is prepared and visualised using Google visualization widgets.
 
 First the online data file is read in.
 
