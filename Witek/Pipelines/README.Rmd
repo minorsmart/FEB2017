@@ -2,8 +2,11 @@
 title: "Pipeline accidents in the USA"
 author: "Witek ten Hove"
 date: "2/10/2017"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
 ---
+
 
 This is an example on reading data in from an online CSV file. The data is prepared and visualised using Google visualization widgets.
 
