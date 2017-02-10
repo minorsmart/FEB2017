@@ -44,16 +44,4 @@ pipelineDF <- mutate(pipelineDF,
 Finally the map is created and plotted.
  
 
-```r
-library(googleVis)
-pipelinesMap <- gvisGeoChart(pipelineDF, 'LatLong', 
-                          sizevar='All.Costs',
-                          colorvar='Fire',
-                          options=list( region="US",
-                                        width = 1000, heigth = 800,
-                                        colorAxis="{colors:[\'yellow',\'red']}"
-                                        )
-                          )
-plot(pipelinesMap)
-```
 

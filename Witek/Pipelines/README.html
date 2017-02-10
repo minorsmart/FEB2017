@@ -141,16 +141,6 @@ $(document).ready(function () {
                      Fire = as.numeric(Liquid.Ignition) + as.numeric(Liquid.Explosion)
                      )</code></pre>
 <p>Finally the map is created and plotted.</p>
-<pre class="r"><code>library(googleVis)
-pipelinesMap &lt;- gvisGeoChart(pipelineDF, 'LatLong', 
-                          sizevar='All.Costs',
-                          colorvar='Fire',
-                          options=list( region=&quot;US&quot;,
-                                        width = 1000, heigth = 800,
-                                        colorAxis=&quot;{colors:[\'yellow',\'red']}&quot;
-                                        )
-                          )
-plot(pipelinesMap)</code></pre>
 
 
 
