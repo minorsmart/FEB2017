@@ -12,19 +12,17 @@ Lees eerst de data in. Let op: dit is een groot bestand (300MB+). Het kan even d
 ```{r}
 energieDF <- read.csv("https://s3-eu-west-1.amazonaws.com/witex-files/nederland.csv")
 ```
-
+<br>
 Bekijk de eerste paar records met de `head()` functie.
-
 ```{r}
 head(energieDF, 10)
 ```
-
+<br> 
 Onderzoek de structuur met de `str()` functie.
-
 ```{r}
 str(energieDF)
 ```
-
+<br>
 Bekijk de kwaliteit van de data met de `summary()` functie.
 
 ```{r}
