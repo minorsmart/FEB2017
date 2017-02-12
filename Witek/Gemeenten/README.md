@@ -53,7 +53,7 @@ nl
 
 ![](README_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-Voeg de namen van de gemeenten toe. Aan de data frame
+Voeg de namen van de gemeenten toe aan de data frame.
 
 
 ```r
