@@ -80,6 +80,7 @@ Je kunt ook alleen een provincie bekijken.
 
 ```r
 library(dplyr)
+library(ggrepel)
 gldDF <- filter(gemeentenDF,
                 PROVINCIEN == "Gelderland")
 gldNames <- filter(cnames,
@@ -89,7 +90,7 @@ mapCenter <- geocode("Gelderland")
 gld <- get_map(c(lon=mapCenter$lon, lat=mapCenter$lat), zoom = 9, maptype = "terrain", source="stamen")
 gld <- ggmap(gld)
 gld <- gld +
-  geom_text(data=gldNames, aes(long, lat, label = GEMEENTENA), size=3) +
+  
   geom_polygon(aes(x=long,
                    y=lat,
                    group=group),
@@ -97,7 +98,11 @@ gld <- gld +
                size=.3,
                color='red',
                data=gldDF,
-               alpha=0.2)
+               alpha=0.4) +
+  geom_label_repel(data = gldNames, aes(x = long, y = lat, label = GEMEENTENA), 
+                 fill = "white", box.padding = unit(.4, "lines"),
+                 label.padding = unit(.15, "lines"))
+
 #ggsave(gld, file = "gld.png", width = 8, height = 8, type = "cairo-png")
 ```
 
