@@ -2,7 +2,7 @@
 Witek ten Hove  
 2/12/2017  
 
-De data is online beschikbaar. O.a. (hier)[https://data.overheid.nl/data/dataset/grenzen-van-alle-nederlandse-gemeenten-en-provincies/resource/d5570855-ceb7-458b-ba93-61e5ec332649]. Plaats alle shapefiles in dezelfde folder als je R script en lees de data in.
+De data is online beschikbaar. O.a. [hier](https://data.overheid.nl/data/dataset/grenzen-van-alle-nederlandse-gemeenten-en-provincies/resource/d5570855-ceb7-458b-ba93-61e5ec332649). Plaats alle shapefiles in dezelfde folder als je R script en lees de data in.
 
 
 ```r

@@ -11,6 +11,10 @@ gemeentenShp <- spTransform(gemeentenShp, CRS("+proj=longlat +datum=WGS84"))
 
 
 gemeentenDF <- tidy(gemeentenShp)
+gemeentenMeta <- gemeentenShp@data
+gemeentenMeta$ID <- row.names(gemeentenMeta)
+
+gemeentenDF <- merge(gemeentenDF, gemeentenMeta, by.x = 'id', by.y = 'ID')
 
 nl<-get_map("Netherlands",zoom=8)
 ggmap(nl) + 
