@@ -66,7 +66,7 @@ Maak een aparte data frame aan met de namen van de gemeenten en het middelpunt v
 
 
 ```r
-cnames <- aggregate(cbind(long, lat) ~ GEMEENTENA, data=gemeentenDF, FUN=mean)
+cnames <- aggregate(cbind(long, lat) ~ GEMEENTENA + PROVINCIEN, data=gemeentenDF, FUN=mean)
 
 nl <- nl +
   geom_text(data=cnames, aes(long, lat, label = GEMEENTENA), size=2)
@@ -74,6 +74,34 @@ nl
 ```
 
 ![](README_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+Je kunt ook alleen een provincie bekijken.
+
+
+```r
+library(dplyr)
+gldDF <- filter(gemeentenDF,
+                PROVINCIEN == "Gelderland")
+gldNames <- filter(cnames,
+                PROVINCIEN == "Gelderland")
+
+mapCenter <- geocode("Gelderland")
+gld <- get_map(c(lon=mapCenter$lon, lat=mapCenter$lat), zoom = 9, maptype = "terrain", source="stamen")
+gld <- ggmap(gld)
+gld <- gld +
+  geom_text(data=gldNames, aes(long, lat, label = GEMEENTENA), size=3, color = 'black') +
+  geom_polygon(aes(x=long,
+                   y=lat,
+                   group=group),
+               fill='blue',
+               size=.2,
+               color='red',
+               data=gldDF,
+               alpha=0.3)
+gld
+```
+
+![](README_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 Source:
 
