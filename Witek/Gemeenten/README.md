@@ -1,8 +1,6 @@
-# Untitled
+# Gemeentekaart Nederland in R
 Witek ten Hove  
 2/12/2017  
-
-## Genereer een gemeentekaart van Nederland
 
 De data is online beschikbaar. O.a. (hier)[https://data.overheid.nl/data/dataset/grenzen-van-alle-nederlandse-gemeenten-en-provincies/resource/d5570855-ceb7-458b-ba93-61e5ec332649]. Plaats alle shapefiles in dezelfde folder als je R script en lees de data in.
 
