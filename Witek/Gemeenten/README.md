@@ -89,19 +89,19 @@ mapCenter <- geocode("Gelderland")
 gld <- get_map(c(lon=mapCenter$lon, lat=mapCenter$lat), zoom = 9, maptype = "terrain", source="stamen")
 gld <- ggmap(gld)
 gld <- gld +
-  geom_text(data=gldNames, aes(long, lat, label = GEMEENTENA), size=3, color = 'black') +
+  geom_text(data=gldNames, aes(long, lat, label = GEMEENTENA), size=3) +
   geom_polygon(aes(x=long,
                    y=lat,
                    group=group),
                fill='blue',
-               size=.2,
+               size=.3,
                color='red',
                data=gldDF,
-               alpha=0.3)
-gld
+               alpha=0.2)
+#ggsave(gld, file = "gld.png", width = 8, height = 8, type = "cairo-png")
 ```
 
-![](README_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](gld.png)
 
 Source:
 
