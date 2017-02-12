@@ -51,7 +51,7 @@ ggmap(nl) +
 
 ![](README_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-![](nl.png)
+
 Source:
 
 D. Kahle and H. Wickham. ggmap: Spatial Visualization with ggplot2. The R

@@ -43,7 +43,7 @@ ggmap(nl) +
                alpha=0)
 ```
 
-![](nl.png)
+
 Source:
 
 D. Kahle and H. Wickham. ggmap: Spatial Visualization with ggplot2. The R
