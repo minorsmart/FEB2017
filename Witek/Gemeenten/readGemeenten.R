@@ -11,15 +11,24 @@ gemeentenShp <- spTransform(gemeentenShp, CRS("+proj=longlat +datum=WGS84"))
 
 
 gemeentenDF <- tidy(gemeentenShp)
-gemeentenMeta <- gemeentenShp@data
-gemeentenMeta$ID <- row.names(gemeentenMeta)
 
-gemeentenDF <- merge(gemeentenDF, gemeentenMeta, by.x = 'id', by.y = 'ID')
 
 nl<-get_map("Netherlands",zoom=8)
-ggmap(nl) + 
-  geom_polygon(aes(x=long, y=lat, group=group),
+nl <- ggmap(nl) +
+  geom_polygon(aes(x=long,
+                   y=lat,
+                   group=group),
                fill='grey',
-               size=.2,color='green',
+               size=.2,
+               color='green',
                data=gemeentenDF,
                alpha=0)
+nl
+
+gemeentenMeta <- gemeentenShp@data
+gemeentenMeta$ID <- row.names(gemeentenMeta)
+gemeentenDF <- merge(gemeentenDF, gemeentenMeta, by.x = 'id', by.y = 'ID')
+cnames <- aggregate(cbind(long, lat) ~ GEMEENTENA, data=gemeentenDF, FUN=mean)
+
+nl <- nl + geom_text(data=cnames, aes(long, lat, label = GEMEENTENA), size=2)
+nl
