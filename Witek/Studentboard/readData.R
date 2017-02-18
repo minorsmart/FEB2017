@@ -26,10 +26,9 @@ vCols <- data.frame(apply(vCols[1:7],2, cleanCols))
 dfMeans <- data.frame(Z = rowMeans(zCols), U = rowMeans(uCols), S = rowMeans(sCols), V = rowMeans(vCols))
 row.names(dfMeans) <- dfData[[2]]
 
-
-
 rowIx <- 4
 
+## data must be in columns
 scores <- t(dfMeans[rowIx,])
 scores <- data.frame(labs = rownames(scores), scores)
 
