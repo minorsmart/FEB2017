@@ -1,6 +1,8 @@
 library(gsheet)
 library(dplyr)
 library(radarchart)
+library(ggplot2)
+library(reshape2)
 
 ## Read in data
 url <- "https://docs.google.com/spreadsheets/d/1gq-DXkAf4QpZKcgQnABv634DKXjTCHepUi5rHw19Yeg/edit?usp=sharing"
@@ -14,21 +16,30 @@ vCols <- select(dfData, matches("V[0-9]"))
 
 cleanCols <- function(x) {
   as.numeric(
-    gsub(pattern = "[A-Z][a-z]*\\s\\(|\\)", replacement = "", x, ignore.case = FALSE, perl = FALSE,
-                              fixed = FALSE, useBytes = FALSE)
+    gsub(pattern = "[A-Z][a-z]*\\s\\(|\\)", replacement = "", x)
   )
-  }
-zCols <- data.frame(apply(zCols[1:7],2, cleanCols))
-uCols <- data.frame(apply(uCols[1:7],2, cleanCols))
-sCols <- data.frame(apply(sCols[1:7],2, cleanCols))
-vCols <- data.frame(apply(vCols[1:7],2, cleanCols))
+}
+
+zCols <- data.frame(apply(zCols,2, cleanCols))
+uCols <- data.frame(apply(uCols,2, cleanCols))
+sCols <- data.frame(apply(sCols,2, cleanCols))
+vCols <- data.frame(apply(vCols,2, cleanCols))
 
 dfMeans <- data.frame(Z = rowMeans(zCols), U = rowMeans(uCols), S = rowMeans(sCols), V = rowMeans(vCols))
-row.names(dfMeans) <- dfData[[2]]
+newMeans <- cbind(dfData[2],dfMeans)
+meltMeans <- melt(newMeans)
 
+ggplot(meltMeans) +
+  geom_point(aes(x = Naam.deelnemer, y = value, col = variable, fill = variable)) +
+  theme(axis.text.x = element_text(angle=45))
+
+ggplot(meltMeans) +
+  geom_col(aes(x = Naam.deelnemer, y = value, col = variable, fill = variable)) +
+  theme(axis.text.x = element_text(angle=90))
+  
 rowIx <- c(1:7)
 
-## data must be in columns
+## data must be in columns, transposed
 scores <- t(dfMeans[rowIx,])
 scores <- data.frame(labs = rownames(scores), scores)
 
