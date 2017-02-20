@@ -3,7 +3,7 @@ title: "Entrepreneurial behaviour"
 output: html_notebook
 ---
 
-Participants of MSI are monitoring their entrepreneurial growth. They regularly reflect on their actions and record their behaviour via a online form.
+Participants of MSI are monitoring their entrepreneurial growth. They regularly reflect on their actions and record their behaviour via an online form.
 
 In this exercise we are going to read in the values from the Google spreadsheet and perform some standard operations on the data. First we'll load the necessary libraries.
 
@@ -40,7 +40,7 @@ sCols <- select(dfData, matches("S[0-9]"))
 vCols <- select(dfData, matches("V[0-9]"))
 ```
 
-Now we have four separate data frames containing the responses of the participants per set of questions. We can still not work with this data (why not?). To proceed we are going to build a function that we can later on apply to our data. The function takes in a value, first deletes all non-numeric characters (using regex again) and then changes the format to numeric.
+Now we have four separate data frames containing the responses of the participants per set of questions. We still can not work with this data (why not?). In the next step we are going to build a function that we can later on apply to our data. The function takes in a value, deletes all non-numeric characters (using regex again) and then changes the format to numeric.
 
 ```{r}
 cleanCols <- function(x) {
@@ -68,7 +68,7 @@ newMeans <- cbind(dfData[2],dfMeans)
 
 Have a look at the data. What is the structure?
 
-In the next step we are going to plot the data. The package we will use (`ggplot2`) works better with the so called long data format. It is very easy to transform our data set to this format. The package `reshape2` has a function `melt()` that does exactly what we want.
+In the following step we are going to plot the data. The package we will use (`ggplot2`) works better with a so called long data format. It is a rather task easy to transform our data set to this format. The package `reshape2` has a function `melt()` that does exactly what we want. Have a look at this new data set.
 
 ```{r}
 meltMeans <- melt(newMeans)
