@@ -29,7 +29,7 @@ head(dfData)
 str(dfData)
 ```
 
-What we got is just a copy of the spreadsheet. Currently it has `r dim(dfData)[1]` rows and `r dim(dfData)[2]` columns. The first two columns contain timestamps and the names of all participants and the remaining columns have string values consisting of some quality factor ("Soms" or "Vaak") and a number between brackets.
+What we got is just a copy of the spreadsheet. Currently it has `r dim(dfData)[1]` rows and `r dim(dfData)[2]` columns. The first two columns contain timestamps and the names of all participants. The remaining columns have string values consisting of some quality factor ("Soms" or "Vaak") and a number between brackets.
 
 The purpose of any analytics exercise is to make some sense of the large amount of data. In this case we are first going to calculate some means. The columns in the data frame can be grouped by the characters Z, U, S and V. So the initial thing to do is to select columns containing the same character. For this we use a so called regular expression (or regex). If you want to know more about regex and do some testing you can use [this site]("http://regexr.com/"). The `select()` function belongs to the `dplyr` package.
 
