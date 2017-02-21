@@ -23,7 +23,7 @@ url <- "https://docs.google.com/spreadsheets/d/1gq-DXkAf4QpZKcgQnABv634DKXjTCHep
 dfData <- gsheet2tbl(url)
 
 ## View the first few records
-head(dfData)
+head(dfData,10)
 
 ## Explore the structure of the data set
 str(dfData)
@@ -63,24 +63,47 @@ Now we will calculate per row the mean value and combine the results in a new da
 
 ```{r}
 dfMeans <- data.frame(Z = rowMeans(zCols), U = rowMeans(uCols), S = rowMeans(sCols), V = rowMeans(vCols))
-newMeans <- cbind(dfData[2],dfMeans)
+newMeans <- cbind(dfData[1:2],dfMeans)
 ```
 
 Have a look at the data. What is the structure?
 
-In the following step we are going to plot the data. The package we will use (`ggplot2`) works better with a so called long data format. It is a rather task easy to transform our data set to this format. The package `reshape2` has a function `melt()` that does exactly what we want. Have a look at this new data set.
+In the following steps we are going to plot the data. The package we will use (`ggplot2`) works better with a so called long data format. It is a rather task easy to transform our data set to this format. The package `reshape2` has a function `melt()` that does exactly what we want. Have a look at this new data set.
 
 ```{r}
 meltMeans <- melt(newMeans)
 ```
 
+Maybe it would be useful to be able to filter the data on date. For this we'll transform the Timestamp variable into a date format. As a test we'll filter on an arbitrary date and a selected name.
+
+```{r}
+meltMeans$Timestamp <- as.Date(meltMeans$Timestamp, format = "%d/%m/%Y")
+filterMeans <- filter(meltMeans, Timestamp == "2017-02-15", Naam.deelnemer == "Bouwmeister Rick")
+filterMeans
+```
+
+
 Now we can make a simple bar plot.
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 meanPlot <- ggplot(meltMeans) + 
-  geom_col(aes(x = Naam.deelnemer, y = value, col = variable, fill = variable)) +
+  geom_col(aes(x = Timestamp, y = value, col = variable, fill = variable)) +
   theme(axis.text.x = element_text(angle=90))
 meanPlot
 ```
 
-**De opdracht voor deze oefening luidt:** Vul het formulier opnieuw in en bouw een grafiek met alleen jouw eigen data. Op de x-as staan de timestamps.
+A bit more complicated to build, but slightly better interpretable is a spider chart.
+
+```{r}
+
+newMeans$Timestamp <- as.Date(newMeans$Timestamp, format = "%d/%m/%Y")
+filterDF <- filter(newMeans, Naam.deelnemer == "Brouwer Natascha")
+
+## data must be in columns, transposed
+scores <- t(filterDF[c(3,4,5,6)])
+scores <- data.frame(labs = rownames(scores), scores)
+colnames(scores)[c(2,3)] <- as.character(filterDF$Timestamp)
+
+chartJSRadar(scores = scores, maxScale = 3, main = paste("Naam:", filterDF$Naam.deelnemer[1]), polyAlpha = 0)
+```
+
