@@ -109,6 +109,6 @@ scores <- t(filterDF[c(3,4,5,6)])
 scores <- data.frame(labs = rownames(scores), scores)
 colnames(scores)[c(2,3)] <- as.character(filterDF$Timestamp)
 
-chartJSRadar(scores = scores, maxScale = 3, main = paste("Naam:", filterDF$Naam.deelnemer[1]), polyAlpha = 0, height = 100, width = 100)
+chartJSRadar(scores = scores, maxScale = 3, main = paste("Naam:", filterDF$Naam.deelnemer[1]), polyAlpha = 0)
 ```
 
