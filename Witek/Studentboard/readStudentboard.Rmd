@@ -110,6 +110,9 @@ filterDF <- mutate(filterDF,
 ## data must be in columns, transposed
 scores <- t(filterDF[c(3,4,5,6)])
 scores <- data.frame(labs = rownames(scores), scores)
+
+## Set the columnames of the columns with the scores to the associated timestamps.
+## Start at column two and end at the last column (max = n)
 colnames(scores)[c(seq(2,dim(scores)[2]))] <- as.character(tail(filterDF$Timestamp, n))
 
 chartJSRadar(scores = scores, maxScale = 3, main = paste("Naam:", filterDF$Naam.deelnemer[1]), polyAlpha = 0)
