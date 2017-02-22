@@ -98,6 +98,9 @@ A bit more complicated to build, but slightly better interpretable is a spider c
 
 newMeans$Timestamp <- as.Date(newMeans$Timestamp, format = "%d/%m/%Y")
 filterDF <- filter(newMeans, Naam.deelnemer == "Brouwer Natascha")
+## maximum is last n rows
+n <- 10
+filterDF <- tail(filterDF,n)
 filterDF <- mutate(filterDF,
                    Z = round(Z, 1),
                    U = round(U, 1),
@@ -107,8 +110,37 @@ filterDF <- mutate(filterDF,
 ## data must be in columns, transposed
 scores <- t(filterDF[c(3,4,5,6)])
 scores <- data.frame(labs = rownames(scores), scores)
-colnames(scores)[c(2,3)] <- as.character(filterDF$Timestamp)
+colnames(scores)[c(seq(2,dim(scores)[2]))] <- as.character(tail(filterDF$Timestamp, n))
 
 chartJSRadar(scores = scores, maxScale = 3, main = paste("Naam:", filterDF$Naam.deelnemer[1]), polyAlpha = 0)
 ```
+Alternative 1
+
+```{r}
+library(fmsb)
+
+## Set up the data frame
+data <- filterDF[3:6]
+rownames(data) <- filterDF[[1]]
+ 
+## To use the fmsb package, I have to add 2 lines to the dataframe: the max and min of each topic to show on the plot!
+data=rbind(rep(3,4) , rep(0,4) , data)
+
+colors_border=topo.colors(2)
+radarchart( data  , axistype=1 , seg = 6,
+    #custom polygon
+    pcol=colors_border , plwd=4 , plty=1,
+    #custom the grid
+    cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,3,0.5), cglwd=0.8,
+    #custom labels
+    vlcex=0.8 
+    )
+legend(x=0.7, y=1, legend = rownames(data[-c(1,2),]), bty = "n", pch=20 , col=colors_border , text.col = "grey", cex=1.2, pt.cex=3)
+```
+
+
+
+
+
+
 
