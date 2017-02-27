@@ -92,6 +92,19 @@ meanPlot <- ggplot(meltMeans) +
 meanPlot
 ```
 
+```{r}
+library(hrbrthemes)
+meanPlot <- ggplot(meltMeans) + 
+  geom_col(aes(x = Timestamp, y = value, col = variable, fill = variable)) +
+  theme(axis.text.x = element_text(angle=90)) +
+  scale_fill_ipsum() +
+  scale_color_ipsum() +
+  theme_ipsum()
+meanPlot
+
+```
+
+
 A bit more complicated to build, but slightly better interpretable is a spider chart.
 
 ```{r}
