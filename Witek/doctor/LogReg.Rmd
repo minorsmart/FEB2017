@@ -3,7 +3,7 @@ title: "Logistic regression"
 output: html_notebook
 ---
 
-In this tutorial I will explain how you can build a logistical regression model and test it. First we'll load a data set. It comes from [Kaggle](https://www.kaggle.com/joniarroba/noshowappointments). The data set is compressed and we are going to read directly from the zip file (otherwise it would take too long: 4 versus 24MB).
+In this tutorial I will explain how you can build a logistic regression model and test it. First we'll load a data set. It comes from [Kaggle](https://www.kaggle.com/joniarroba/noshowappointments). The data set is compressed and we are going to read directly from the zip file (otherwise it would take too long: 4 versus 24MB).
 
 ```{r}
 temp <- tempfile()
