@@ -65,7 +65,7 @@ print(paste('Accuracy',1-misClasificError))
 cfnMat <- confusionMatrix(test$predictb, test$Status)
 print(cfnMat)
 ```
-Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 50% right all the times and when it predicts 1 (= Show-up) it is `r paste0(round(100*cfnMat$table[2,2] / (cfnMat$table[2,1] + cfnMat$table[2,2])), "%")` correct.
+Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is `r paste0(round(100*cfnMat$table[1,2] / (cfnMat$table[1,1] + cfnMat$table[1,2])), "%")` right all the times and when it predicts 1 (= Show-up) it is `r paste0(round(100*cfnMat$table[2,2] / (cfnMat$table[2,1] + cfnMat$table[2,2])), "%")` correct.
 
 We also see that the likelihood that the quoted accuracy actually is higher than the accuracy of a predition without any information is just around 50% (ergo: just as likely to be higher as lower). The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*mean(data$Status)), "%")`, which is almost equal to the accuracy of the logistic model.
 
