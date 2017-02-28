@@ -1,0 +1,72 @@
+---
+title: "Logistical regression"
+output: html_notebook
+---
+
+In this tutorial I will explain how you can build a logistical regression model and test it. First we'll load a data set. It comes from [Kaggle](https://www.kaggle.com/joniarroba/noshowappointments). The data set is compressed and we are going to read directly from the zip file (otherwise it would take too long: 4 versus 24MB).
+
+```{r}
+temp <- tempfile()
+download.file("https://github.com/minorsmart/FEB2017/blob/master/Witek/doctor/No-show-Issue-Comma-300k.csv.zip?raw=true",temp)
+data <- read.csv(unz(temp, "No-show-Issue-Comma-300k.csv"))
+unlink(temp)
+```
+
+Now we have the data set in a data frame we can start preparing it for the model. We'll first load some usefull packages and then look at the structure and quality of the data.
+
+```{r, echo=TRUE}
+library(dplyr)
+library(caTools)
+library(biglm)
+library(caret)
+
+str(data)
+summary(data)
+```
+
+The data set comprises of 300,000 recorded doctor's appointments with 15 variables. We have a lot of categorical variables of which many are boolean (0 or 1). We want to predict whether a patient will show up for a doctor's appointment (variable `Status`).
+
+Clearly the registration and appointment date will not have much predictive power as they are rather unique. We will delete these variables from the set.
+
+We also see some peculiar ages like 113 and -2 years. We'll filter out all ages below 5 and above 95.
+
+Finally we will change the `Status` variable into a **0**/**1** boolean. This will help us interpret the predicted value at the end.
+
+```{r}
+data <- data[,-c(3,4)]
+data <- filter(data, Age > 5, Age < 95)
+data$Status <- (data$Status == "Show-Up")*1
+str(data)
+summary(data)
+```
+
+The cleaning deleted around 28,000 records. We will now split the data frame into two sets. One for training the model and one for testing it. When we split we need to take care that each set has enough variability in the predicted variable (`Status`). Otherwise either it can not learn properly or it can not do a meaningful test (imagine all values of `Status` in one of the subsets were **1** or **0**). This is where the function `sample.split()` from the `caret` package comes in.
+
+```{r}
+data$spl <- sample.split(data$Status, SplitRatio=0.70)
+train <- subset(data, data$spl==TRUE)
+test <- subset(data, data$spl==FALSE)
+```
+
+Now we can train a model using a logistic regression and have a look at the parameters.
+
+```{r}
+model <- glm (Status ~ . -spl, data = train, family = binomial)
+summary(model)
+```
+We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at `r a <- 0.5; a`.
+
+```{r}
+test$predict <- predict(model, newdata=test, type='response')
+test$predictb <- ifelse(test$predict > a,1,0)
+misClasificError <- mean(test$predictb != test$Status)
+print(paste('Accuracy',1-misClasificError))
+
+cfnMat <- confusionMatrix(test$predictb, test$Status)
+print(cfnMat)
+```
+Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 50% right all the times and when it predicts 1 (= Show-up) it is `r paste0(round(100*cfnMat$table[2,2] / (cfnMat$table[2,1] + cfnMat$table[2,2])), "%")` correct.
+
+We also see that the likelihood that the quoted accuracy actually is higher than the accuracy of a predition without any information is just around 50% (ergo: just as likely to be higher as lower). The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*mean(data$Status)), "%")`, which is almost equal to the accuracy of the logistic model.
+
+Apparently the process underlying the meeting of doctor's appointments is not linearly logistic. We should try a different approach like nearest neighbours, decision trees, support vector machines or neural networks.
