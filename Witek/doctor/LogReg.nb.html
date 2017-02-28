@@ -194,38 +194,12 @@ unlink(temp)</code></pre>
 <p>Now we have the data set in a data frame we can start preparing it for the model. We’ll first load some usefull packages and then look at the structure and quality of the data.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmBgYCJ9 -->
-<pre class="r"><code>library(dplyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuIn0= -->
-<pre><code>
-Attaching package: ‘dplyr’
-
-The following objects are masked from ‘package:stats’:
-
-    filter, lag
-
-The following objects are masked from ‘package:base’:
-
-    intersect, setdiff, setequal, union</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYVRvb2xzKVxubGlicmFyeShiaWdsbSlcbmBgYCJ9 -->
-<pre class="r"><code>library(caTools)
-library(biglm)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBEQklcbiJ9 -->
-<pre><code>Loading required package: DBI</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYXJldClcbmBgYCJ9 -->
-<pre class="r"><code>library(caret)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBsYXR0aWNlXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IGdncGxvdDJcblVzZSBzdXBwcmVzc1BhY2thZ2VTdGFydHVwTWVzc2FnZXMoKSB0byBlbGltaW5hdGUgcGFja2FnZSBzdGFydHVwIG1lc3NhZ2VzLlxuIn0= -->
-<pre><code>Loading required package: lattice
-Loading required package: ggplot2
-Use suppressPackageStartupMessages() to eliminate package startup messages.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RyKGRhdGEpXG5gYGAifQ== -->
-<pre class="r"><code>str(data)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmxpYnJhcnkoY2FUb29scylcbmxpYnJhcnkoYmlnbG0pXG5saWJyYXJ5KGNhcmV0KVxuc3RyKGRhdGEpXG5gYGAifQ== -->
+<pre class="r"><code>library(dplyr)
+library(caTools)
+library(biglm)
+library(caret)
+str(data)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiJ2RhdGEuZnJhbWUnOlx0MzAwMDAwIG9icy4gb2YgIDE1IHZhcmlhYmxlczpcbiAkIEFnZSAgICAgICAgICAgICAgICAgICAgOiBpbnQgIDE5IDI0IDQgNSAzOCA1IDQ2IDQgMjAgNTEgLi4uXG4gJCBHZW5kZXIgICAgICAgICAgICAgICAgIDogRmFjdG9yIHcvIDIgbGV2ZWxzIFwiRlwiLFwiTVwiOiAyIDEgMSAyIDIgMSAxIDEgMSAxIC4uLlxuICQgQXBwb2ludG1lbnRSZWdpc3RyYXRpb246IEZhY3RvciB3LyAyOTU0MjUgbGV2ZWxzIFwiMjAxMy0wNS0yOVQxNToxNDoxMVpcIiwuLjogMTUyMTEyIDI0ODIwMCAyMzA3MSA4NzI2OCAyNzQ2MTIgNzE1ODUgMjI1MzA1IDI0NDc0OSAxMjUxODQgNzAzNTQgLi4uXG4gJCBBcG9pbnRtZW50RGF0YSAgICAgICAgIDogRmFjdG9yIHcvIDUzNCBsZXZlbHMgXCIyMDE0LTAxLTAyVDAwOjAwOjAwWlwiLC4uOiAyOTAgNDQwIDM2IDE2NCA0OTAgMTUyIDQwOCA0NDIgMjMyIDEyNSAuLi5cbiAkIERheU9mVGhlV2VlayAgICAgICAgICAgOiBGYWN0b3Igdy8gNyBsZXZlbHMgXCJGcmlkYXlcIixcIk1vbmRheVwiLC4uOiA3IDcgNiA1IDYgNiA2IDEgNiA2IC4uLlxuICQgU3RhdHVzICAgICAgICAgICAgICAgICA6IEZhY3RvciB3LyAyIGxldmVscyBcIk5vLVNob3dcIixcIlNob3ctVXBcIjogMiAyIDIgMiAyIDEgMiAyIDIgMiAuLi5cbiAkIERpYWJldGVzICAgICAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDEgLi4uXG4gJCBBbGNvb2xpc20gICAgICAgICAgICAgIDogaW50ICAwIDAgMCAwIDAgMCAwIDAgMCAwIC4uLlxuICQgSGlwZXJUZW5zaW9uICAgICAgICAgICA6IGludCAgMCAwIDAgMCAwIDAgMCAwIDAgMSAuLi5cbiAkIEhhbmRjYXAgICAgICAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDAgLi4uXG4gJCBTbW9rZXMgICAgICAgICAgICAgICAgIDogaW50ICAwIDAgMCAwIDAgMCAwIDAgMCAwIC4uLlxuICQgU2Nob2xhcnNoaXAgICAgICAgICAgICA6IGludCAgMCAwIDAgMCAwIDAgMCAxIDAgMCAuLi5cbiAkIFR1YmVyY3Vsb3NpcyAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDAgLi4uXG4gJCBTbXNfUmVtaW5kZXIgICAgICAgICAgIDogaW50ICAwIDAgMCAxIDEgMSAxIDEgMCAxIC4uLlxuICQgQXdhaXRpbmdUaW1lICAgICAgICAgICA6IGludCAgLTI5IC0xIC0xIC0xNSAtNiAtMzUgLTE4IC0xNCAtMTQgLTQgLi4uXG4ifQ== -->
 <pre><code>'data.frame':   300000 obs. of  15 variables:
@@ -344,45 +318,45 @@ test &lt;- subset(data, data$spl==FALSE)</code></pre>
 <pre class="r"><code>model &lt;- glm (Status ~ . -spl, data = train, family = binomial)
 summary(model)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSBTdGF0dXMgfiAuIC0gc3BsLCBmYW1pbHkgPSBiaW5vbWlhbCwgZGF0YSA9IHRyYWluKVxuXG5EZXZpYW5jZSBSZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgICAxUSAgIE1lZGlhbiAgICAgICAzUSAgICAgIE1heCAgXG4tMS45NjU3ICAtMS4zOTYzICAgMC43NTY0ICAgMC44NzQyICAgMi4zOTA1ICBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgICAgICAgICAgICAwLjQ2NTc0NTEgIDAuMDE3NzY2MSAgMjYuMjE1ICA8IDJlLTE2ICoqKlxuQWdlICAgICAgICAgICAgICAgICAgICAwLjAxMjE0OTQgIDAuMDAwMjkzOCAgNDEuMzQ5ICA8IDJlLTE2ICoqKlxuR2VuZGVyTSAgICAgICAgICAgICAgIC0wLjAwNDMzNzYgIDAuMDExMTA0MyAgLTAuMzkxIDAuNjk2MDczICAgIFxuRGF5T2ZUaGVXZWVrTW9uZGF5ICAgIC0wLjA4MTIwNTcgIDAuMDE2NTUwNCAgLTQuOTA3IDkuMjdlLTA3ICoqKlxuRGF5T2ZUaGVXZWVrU2F0dXJkYXkgIC0wLjQyODE2NzYgIDAuMDY4OTIyNSAgLTYuMjEyIDUuMjJlLTEwICoqKlxuRGF5T2ZUaGVXZWVrU3VuZGF5ICAgICAwLjIzMjQ2MDUgIDEuMTU5MTQxNSAgIDAuMjAxIDAuODQxMDU0ICAgIFxuRGF5T2ZUaGVXZWVrVGh1cnNkYXkgICAwLjA1NDYyODggIDAuMDE2NDg5MiAgIDMuMzEzIDAuMDAwOTIzICoqKlxuRGF5T2ZUaGVXZWVrVHVlc2RheSAgICAwLjA3MDEyNjggIDAuMDE2NDU5MyAgIDQuMjYxIDIuMDRlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrV2VkbmVzZGF5ICAwLjAyMTAwMTggIDAuMDE2MjU1OCAgIDEuMjkyIDAuMTk2MzcyICAgIFxuRGlhYmV0ZXMgICAgICAgICAgICAgIC0wLjAyNTk3OTAgIDAuMDIwOTQ3MyAgLTEuMjQwIDAuMjE0ODk4ICAgIFxuQWxjb29saXNtICAgICAgICAgICAgIC0wLjMxMzAwODIgIDAuMDMyMjM0OCAgLTkuNzEwICA8IDJlLTE2ICoqKlxuSGlwZXJUZW5zaW9uICAgICAgICAgICAwLjA0MjQ1OTMgIDAuMDE1MTA4MSAgIDIuODEwIDAuMDA0OTQ4ICoqIFxuSGFuZGNhcCAgICAgICAgICAgICAgICAwLjAwMjI5NTMgIDAuMDMyNDI0MiAgIDAuMDcxIDAuOTQzNTY2ICAgIFxuU21va2VzICAgICAgICAgICAgICAgIC0wLjI0NTMwMDQgIDAuMDIyODM5NSAtMTAuNzQwICA8IDJlLTE2ICoqKlxuU2Nob2xhcnNoaXAgICAgICAgICAgIC0wLjE3MzU1ODkgIDAuMDE2NjY2OSAtMTAuNDEzICA8IDJlLTE2ICoqKlxuVHViZXJjdWxvc2lzICAgICAgICAgIC0wLjI0OTQzMTggIDAuMjE4MDA1OSAgLTEuMTQ0IDAuMjUyNTYxICAgIFxuU21zX1JlbWluZGVyICAgICAgICAgICAwLjEwOTM5NDQgIDAuMDEwNjM2NSAgMTAuMjg1ICA8IDJlLTE2ICoqKlxuQXdhaXRpbmdUaW1lICAgICAgICAgICAwLjAxMDU0NjMgIDAuMDAwMzI3NSAgMzIuMjA0ICA8IDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgYmlub21pYWwgZmFtaWx5IHRha2VuIHRvIGJlIDEpXG5cbiAgICBOdWxsIGRldmlhbmNlOiAyMzI3NTIgIG9uIDE5MDQ0OCAgZGVncmVlcyBvZiBmcmVlZG9tXG5SZXNpZHVhbCBkZXZpYW5jZTogMjI4Njk5ICBvbiAxOTA0MzEgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiAyMjg3MzVcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDRcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSBTdGF0dXMgfiAuIC0gc3BsLCBmYW1pbHkgPSBiaW5vbWlhbCwgZGF0YSA9IHRyYWluKVxuXG5EZXZpYW5jZSBSZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgICAxUSAgIE1lZGlhbiAgICAgICAzUSAgICAgIE1heCAgXG4tMS45NzQyICAtMS4zOTM2ICAgMC43NTUwICAgMC44NzQ2ICAgMi4zOTkyICBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgICAgICAgICAgICAwLjQ2ODM0NTUgIDAuMDE3NzY2OSAgMjYuMzYwICA8IDJlLTE2ICoqKlxuQWdlICAgICAgICAgICAgICAgICAgICAwLjAxMjI4NDggIDAuMDAwMjk0MCAgNDEuNzkwICA8IDJlLTE2ICoqKlxuR2VuZGVyTSAgICAgICAgICAgICAgIC0wLjAyNjY0MDEgIDAuMDExMDg5OSAgLTIuNDAyIDAuMDE2Mjk3ICogIFxuRGF5T2ZUaGVXZWVrTW9uZGF5ICAgIC0wLjA2OTQ1OTUgIDAuMDE2NTc1OSAgLTQuMTkwIDIuNzhlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrU2F0dXJkYXkgIC0wLjQ1Nzk1NjYgIDAuMDY4MDI4MyAgLTYuNzMyIDEuNjhlLTExICoqKlxuRGF5T2ZUaGVXZWVrU3VuZGF5ICAgICA3LjQ5NTQ1NTMgMjUuMzIyMjY3NyAgIDAuMjk2IDAuNzY3MjI4ICAgIFxuRGF5T2ZUaGVXZWVrVGh1cnNkYXkgICAwLjA0NjAyMTcgIDAuMDE2NDk1NyAgIDIuNzkwIDAuMDA1MjcyICoqIFxuRGF5T2ZUaGVXZWVrVHVlc2RheSAgICAwLjA2ODIwNzEgIDAuMDE2NDcxNSAgIDQuMTQxIDMuNDZlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrV2VkbmVzZGF5ICAwLjAzMDQzOTAgIDAuMDE2MjczNSAgIDEuODcwIDAuMDYxNDE5IC4gIFxuRGlhYmV0ZXMgICAgICAgICAgICAgIC0wLjA0MzE4NDEgIDAuMDIwOTI1NyAgLTIuMDY0IDAuMDM5MDQ4ICogIFxuQWxjb29saXNtICAgICAgICAgICAgIC0wLjMwNDIzOTkgIDAuMDMyNDUwNSAgLTkuMzc2ICA8IDJlLTE2ICoqKlxuSGlwZXJUZW5zaW9uICAgICAgICAgICAwLjA1MTY3NDIgIDAuMDE1MTMxNiAgIDMuNDE1IDAuMDAwNjM4ICoqKlxuSGFuZGNhcCAgICAgICAgICAgICAgIC0wLjAxNjI3MTMgIDAuMDMxOTU0MCAgLTAuNTA5IDAuNjEwNjA0ICAgIFxuU21va2VzICAgICAgICAgICAgICAgIC0wLjIzNDIwMjkgIDAuMDIyOTA0MCAtMTAuMjI1ICA8IDJlLTE2ICoqKlxuU2Nob2xhcnNoaXAgICAgICAgICAgIC0wLjE4Mjk2MTcgIDAuMDE2NjU2MCAtMTAuOTg1ICA8IDJlLTE2ICoqKlxuVHViZXJjdWxvc2lzICAgICAgICAgIC0wLjAxNzk4NzkgIDAuMjI1OTAyNiAgLTAuMDgwIDAuOTM2NTM0ICAgIFxuU21zX1JlbWluZGVyICAgICAgICAgICAwLjEwNjgzMTUgIDAuMDEwNjQ1NSAgMTAuMDM1ICA8IDJlLTE2ICoqKlxuQXdhaXRpbmdUaW1lICAgICAgICAgICAwLjAxMDY0NjcgIDAuMDAwMzI3MyAgMzIuNTI2ICA8IDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgYmlub21pYWwgZmFtaWx5IHRha2VuIHRvIGJlIDEpXG5cbiAgICBOdWxsIGRldmlhbmNlOiAyMzI3NTIgIG9uIDE5MDQ0OCAgZGVncmVlcyBvZiBmcmVlZG9tXG5SZXNpZHVhbCBkZXZpYW5jZTogMjI4NjA3ICBvbiAxOTA0MzEgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiAyMjg2NDNcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDdcbiJ9 -->
 <pre><code>
 Call:
 glm(formula = Status ~ . - spl, family = binomial, data = train)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--1.9657  -1.3963   0.7564   0.8742   2.3905  
+-1.9742  -1.3936   0.7550   0.8746   2.3992  
 
 Coefficients:
                         Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)            0.4657451  0.0177661  26.215  &lt; 2e-16 ***
-Age                    0.0121494  0.0002938  41.349  &lt; 2e-16 ***
-GenderM               -0.0043376  0.0111043  -0.391 0.696073    
-DayOfTheWeekMonday    -0.0812057  0.0165504  -4.907 9.27e-07 ***
-DayOfTheWeekSaturday  -0.4281676  0.0689225  -6.212 5.22e-10 ***
-DayOfTheWeekSunday     0.2324605  1.1591415   0.201 0.841054    
-DayOfTheWeekThursday   0.0546288  0.0164892   3.313 0.000923 ***
-DayOfTheWeekTuesday    0.0701268  0.0164593   4.261 2.04e-05 ***
-DayOfTheWeekWednesday  0.0210018  0.0162558   1.292 0.196372    
-Diabetes              -0.0259790  0.0209473  -1.240 0.214898    
-Alcoolism             -0.3130082  0.0322348  -9.710  &lt; 2e-16 ***
-HiperTension           0.0424593  0.0151081   2.810 0.004948 ** 
-Handcap                0.0022953  0.0324242   0.071 0.943566    
-Smokes                -0.2453004  0.0228395 -10.740  &lt; 2e-16 ***
-Scholarship           -0.1735589  0.0166669 -10.413  &lt; 2e-16 ***
-Tuberculosis          -0.2494318  0.2180059  -1.144 0.252561    
-Sms_Reminder           0.1093944  0.0106365  10.285  &lt; 2e-16 ***
-AwaitingTime           0.0105463  0.0003275  32.204  &lt; 2e-16 ***
+(Intercept)            0.4683455  0.0177669  26.360  &lt; 2e-16 ***
+Age                    0.0122848  0.0002940  41.790  &lt; 2e-16 ***
+GenderM               -0.0266401  0.0110899  -2.402 0.016297 *  
+DayOfTheWeekMonday    -0.0694595  0.0165759  -4.190 2.78e-05 ***
+DayOfTheWeekSaturday  -0.4579566  0.0680283  -6.732 1.68e-11 ***
+DayOfTheWeekSunday     7.4954553 25.3222677   0.296 0.767228    
+DayOfTheWeekThursday   0.0460217  0.0164957   2.790 0.005272 ** 
+DayOfTheWeekTuesday    0.0682071  0.0164715   4.141 3.46e-05 ***
+DayOfTheWeekWednesday  0.0304390  0.0162735   1.870 0.061419 .  
+Diabetes              -0.0431841  0.0209257  -2.064 0.039048 *  
+Alcoolism             -0.3042399  0.0324505  -9.376  &lt; 2e-16 ***
+HiperTension           0.0516742  0.0151316   3.415 0.000638 ***
+Handcap               -0.0162713  0.0319540  -0.509 0.610604    
+Smokes                -0.2342029  0.0229040 -10.225  &lt; 2e-16 ***
+Scholarship           -0.1829617  0.0166560 -10.985  &lt; 2e-16 ***
+Tuberculosis          -0.0179879  0.2259026  -0.080 0.936534    
+Sms_Reminder           0.1068315  0.0106455  10.035  &lt; 2e-16 ***
+AwaitingTime           0.0106467  0.0003273  32.526  &lt; 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
     Null deviance: 232752  on 190448  degrees of freedom
-Residual deviance: 228699  on 190431  degrees of freedom
-AIC: 228735
+Residual deviance: 228607  on 190431  degrees of freedom
+AIC: 228643
 
-Number of Fisher Scoring iterations: 4</code></pre>
+Number of Fisher Scoring iterations: 7</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -395,44 +369,44 @@ test$predictb &lt;- ifelse(test$predict &gt; a,1,0)
 misClasificError &lt;- mean(test$predictb != test$Status)
 print(paste('Accuracy',1-misClasificError))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWNjdXJhY3kgMC42OTkyODA4MjIzMzczODlcIlxuIn0= -->
-<pre><code>[1] &quot;Accuracy 0.699280822337389&quot;</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWNjdXJhY3kgMC42OTk4NTY2NTQ1Mzc0MzVcIlxuIn0= -->
+<pre><code>[1] &quot;Accuracy 0.699856654537435&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2ZuTWF0IDwtIGNvbmZ1c2lvbk1hdHJpeCh0ZXN0JHByZWRpY3RiLCB0ZXN0JFN0YXR1cylcbnByaW50KGNmbk1hdClcbmBgYCJ9 -->
 <pre class="r"><code>cfnMat &lt;- confusionMatrix(test$predictb, test$Status)
 print(cfnMat)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uICAgICAwICAgICAxXG4gICAgICAgICAwICAgMTY4ICAgMjA4XG4gICAgICAgICAxIDI0MzM3IDU2OTA4XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgIEFjY3VyYWN5IDogMC42OTkzICAgICAgICAgIFxuICAgICAgICAgICAgICAgICA5NSUgQ0kgOiAoMC42OTYxLCAwLjcwMjQpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNjk5OCAgICAgICAgICBcbiAgICBQLVZhbHVlIFtBY2MgPiBOSVJdIDogMC42MjE2ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMDA0NSAgICAgICAgICBcbiBNY25lbWFyJ3MgVGVzdCBQLVZhbHVlIDogPDJlLTE2ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBTZW5zaXRpdml0eSA6IDAuMDA2ODU2ICAgICAgICBcbiAgICAgICAgICAgIFNwZWNpZmljaXR5IDogMC45OTYzNTggICAgICAgIFxuICAgICAgICAgUG9zIFByZWQgVmFsdWUgOiAwLjQ0NjgwOSAgICAgICAgXG4gICAgICAgICBOZWcgUHJlZCBWYWx1ZSA6IDAuNzAwNDQ5ICAgICAgICBcbiAgICAgICAgICAgICBQcmV2YWxlbmNlIDogMC4zMDAyMjkgICAgICAgIFxuICAgICAgICAgRGV0ZWN0aW9uIFJhdGUgOiAwLjAwMjA1OCAgICAgICAgXG4gICBEZXRlY3Rpb24gUHJldmFsZW5jZSA6IDAuMDA0NjA3ICAgICAgICBcbiAgICAgIEJhbGFuY2VkIEFjY3VyYWN5IDogMC41MDE2MDcgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgJ1Bvc2l0aXZlJyBDbGFzcyA6IDAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uICAgICAwICAgICAxXG4gICAgICAgICAwICAgMTkzICAgMTg2XG4gICAgICAgICAxIDI0MzEyIDU2OTMwXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgQWNjdXJhY3kgOiAwLjY5OTkgICAgICAgICBcbiAgICAgICAgICAgICAgICAgOTUlIENJIDogKDAuNjk2NywgMC43MDMpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNjk5OCAgICAgICAgIFxuICAgIFAtVmFsdWUgW0FjYyA+IE5JUl0gOiAwLjQ4MDQgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMDA2NCAgICAgICAgIFxuIE1jbmVtYXIncyBUZXN0IFAtVmFsdWUgOiA8MmUtMTYgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBTZW5zaXRpdml0eSA6IDAuMDA3ODc2ICAgICAgIFxuICAgICAgICAgICAgU3BlY2lmaWNpdHkgOiAwLjk5Njc0MyAgICAgICBcbiAgICAgICAgIFBvcyBQcmVkIFZhbHVlIDogMC41MDkyMzUgICAgICAgXG4gICAgICAgICBOZWcgUHJlZCBWYWx1ZSA6IDAuNzAwNzQ2ICAgICAgIFxuICAgICAgICAgICAgIFByZXZhbGVuY2UgOiAwLjMwMDIyOSAgICAgICBcbiAgICAgICAgIERldGVjdGlvbiBSYXRlIDogMC4wMDIzNjUgICAgICAgXG4gICBEZXRlY3Rpb24gUHJldmFsZW5jZSA6IDAuMDA0NjQzICAgICAgIFxuICAgICAgQmFsYW5jZWQgQWNjdXJhY3kgOiAwLjUwMjMxMCAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgJ1Bvc2l0aXZlJyBDbGFzcyA6IDAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
 <pre><code>Confusion Matrix and Statistics
 
           Reference
 Prediction     0     1
-         0   168   208
-         1 24337 56908
-                                          
-               Accuracy : 0.6993          
-                 95% CI : (0.6961, 0.7024)
-    No Information Rate : 0.6998          
-    P-Value [Acc &gt; NIR] : 0.6216          
-                                          
-                  Kappa : 0.0045          
- Mcnemar's Test P-Value : &lt;2e-16          
-                                          
-            Sensitivity : 0.006856        
-            Specificity : 0.996358        
-         Pos Pred Value : 0.446809        
-         Neg Pred Value : 0.700449        
-             Prevalence : 0.300229        
-         Detection Rate : 0.002058        
-   Detection Prevalence : 0.004607        
-      Balanced Accuracy : 0.501607        
-                                          
-       'Positive' Class : 0               
-                                          </code></pre>
+         0   193   186
+         1 24312 56930
+                                         
+               Accuracy : 0.6999         
+                 95% CI : (0.6967, 0.703)
+    No Information Rate : 0.6998         
+    P-Value [Acc &gt; NIR] : 0.4804         
+                                         
+                  Kappa : 0.0064         
+ Mcnemar's Test P-Value : &lt;2e-16         
+                                         
+            Sensitivity : 0.007876       
+            Specificity : 0.996743       
+         Pos Pred Value : 0.509235       
+         Neg Pred Value : 0.700746       
+             Prevalence : 0.300229       
+         Detection Rate : 0.002365       
+   Detection Prevalence : 0.004643       
+      Balanced Accuracy : 0.502310       
+                                         
+       'Positive' Class : 0              
+                                         </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 55% right all the times and when it predicts 1 (= Show-up) it is 70% correct.</p>
+<p>Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 49% right all the times and when it predicts 1 (= Show-up) it is 70% correct.</p>
 <p>We also see that the likelihood that the quoted accuracy actually is higher than the accuracy of a predition without any information is just around 50% (ergo: just as likely to be higher as lower). The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a <strong>1</strong> regardless of any input information it would have an accuracy of 70%, which is almost equal to the accuracy of the logistic model.</p>
 <p>Apparently the process underlying the meeting of doctor’s appointments is not linearly logistic. We should try a different approach like nearest neighbours, decision trees, support vector machines or neural networks.</p>
 <!-- rnb-text-end -->
