@@ -1,6 +1,8 @@
 ---
 title: "Entrepreneurial behaviour"
-output: html_notebook
+output:
+  html_document: default
+  html_notebook: default
 ---
 
 Participants of MSI are monitoring their entrepreneurial growth. They regularly reflect on their actions and record their behaviour via an online form.
@@ -23,7 +25,7 @@ url <- "https://docs.google.com/spreadsheets/d/1gq-DXkAf4QpZKcgQnABv634DKXjTCHep
 dfData <- gsheet2tbl(url)
 
 ## View the first few records
-head(dfData)
+head(dfData,30)
 
 ## Explore the structure of the data set
 str(dfData)
@@ -63,7 +65,7 @@ Now we will calculate per row the mean value and combine the results in a new da
 
 ```{r}
 dfMeans <- data.frame(Z = rowMeans(zCols), U = rowMeans(uCols), S = rowMeans(sCols), V = rowMeans(vCols))
-newMeans <- cbind(dfData[2],dfMeans)
+newMeans <- cbind(dfData[1:2],dfMeans)
 ```
 
 Have a look at the data. What is the structure?
@@ -72,14 +74,15 @@ In the following step we are going to plot the data. The package we will use (`g
 
 ```{r}
 meltMeans <- melt(newMeans)
+meltMeans <- filter(meltMeans, Naam.deelnemer == "Berg Frank van den")
 ```
 
-Now we can make a simple bar plot.
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 meanPlot <- ggplot(meltMeans) + 
-  geom_col(aes(x = Naam.deelnemer, y = value, col = variable, fill = variable)) +
-  theme(axis.text.x = element_text(angle=90))
+  geom_col(aes(x = Timestamp, y = value, col = variable, fill = variable)) +
+  theme(axis.text.x = element_text(angle=90)) 
+  
 meanPlot
 ```
 
