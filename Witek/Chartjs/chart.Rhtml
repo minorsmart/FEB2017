@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js"></script>
+</head>
+
+<body>
+    <a id="json1" target="_blank">JSON</a>
+    <canvas id="myChart"></canvas>
+    <script>
+        //This part prepares the url string
+        var resultsUrlPrefix = "http://ec2-34-252-17-179.eu-west-1.compute.amazonaws.com",
+            url = resultsUrlPrefix + "/ocpu//user/rstudio/library/hellorobert/R/dataTest";
+        //The following posts the url to the OpenCPU server on AWS and
+        //concatenates the reply into a result link
+        $.post(url,
+            function(data) {
+
+                var statResultsLink = resultsUrlPrefix + data.toString().match(/.+\/.val/m) + "\/json";
+                $("#json1").attr("href", statResultsLink)
+                //Fetches the JSON and retrieves fields for chart labels and data
+                $.getJSON(statResultsLink, function(json) {
+                    var namen = json.map(function(item) {
+                        return item.namen;
+                        console.log(namen);
+                    });
+
+                    var leeftijd = json.map(function(item) {
+                        return item.leeftijd;
+                    });
+                    //Prepares data set for chart
+                    var tempData = {
+                        type: 'bar',
+                        data: {
+                            labels: namen,
+                            datasets: [{
+                                label: 'Leeftijd',
+                                data: leeftijd,
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255,99,132,1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    };
+                    //Define chart ID
+                    var ctx = document.getElementById("myChart");
+                    //Build chart
+                    var myChart = new Chart(ctx, tempData);
+                });
+
+            });
+    </script>
+
+</body>
+
+</html>

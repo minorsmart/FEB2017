@@ -44,3 +44,6 @@ scores <- t(dfMeans[rowIx,])
 scores <- data.frame(labs = rownames(scores), scores)
 
 chartJSRadar(scores = scores, maxScale = 3)
+
+
+
