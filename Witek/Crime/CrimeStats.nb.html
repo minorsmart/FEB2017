@@ -232,14 +232,9 @@ table(filterData$Day.of.Week, filterData$Hour)</code></pre>
 <p>Groepeer de data set op dag en uur en tel het aantal incidenten per dag en uur. Visualiseer met een heatmap.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuYGBgIn0= -->
-<pre class="r"><code>library(ggplot2)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiVXNlIHN1cHByZXNzUGFja2FnZVN0YXJ0dXBNZXNzYWdlcygpIHRvIGVsaW1pbmF0ZSBwYWNrYWdlIHN0YXJ0dXAgbWVzc2FnZXMuXG4ifQ== -->
-<pre><code>Use suppressPackageStartupMessages() to eliminate package startup messages.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYnlIb3VyIDwtIGdyb3VwX2J5KGZpbHRlckRhdGEsIERheS5vZi5XZWVrLCBIb3VyKVxucGVySG91ciAgIDwtIHN1bW1hcmlzZShieUhvdXIsIGNvdW50ID0gbigpKVxuZ2dwbG90KGRhdGEgPSBwZXJIb3VyLCBhZXMoeCA9IERheS5vZi5XZWVrLCB5ID0gSG91cikpICtcbiAgZ2VvbV90aWxlKGFlcyhmaWxsID0gY291bnQpKSArXG4gIHNjYWxlX2ZpbGxfZ3JhZGllbnQobG93PVwicm95YWxibHVlXCIsIGhpZ2g9XCJyZWRcIilcbmBgYCJ9 -->
-<pre class="r"><code>byHour &lt;- group_by(filterData, Day.of.Week, Hour)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuYnlIb3VyIDwtIGdyb3VwX2J5KGZpbHRlckRhdGEsIERheS5vZi5XZWVrLCBIb3VyKVxucGVySG91ciAgIDwtIHN1bW1hcmlzZShieUhvdXIsIGNvdW50ID0gbigpKVxuZ2dwbG90KGRhdGEgPSBwZXJIb3VyLCBhZXMoeCA9IERheS5vZi5XZWVrLCB5ID0gSG91cikpICtcbiAgZ2VvbV90aWxlKGFlcyhmaWxsID0gY291bnQpKSArXG4gIHNjYWxlX2ZpbGxfZ3JhZGllbnQobG93PVwicm95YWxibHVlXCIsIGhpZ2g9XCJyZWRcIilcbmBgYCJ9 -->
+<pre class="r"><code>library(ggplot2)
+byHour &lt;- group_by(filterData, Day.of.Week, Hour)
 perHour   &lt;- summarise(byHour, count = n())
 ggplot(data = perHour, aes(x = Day.of.Week, y = Hour)) +
   geom_tile(aes(fill = count)) +
