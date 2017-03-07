@@ -1,0 +1,40 @@
+---
+title: "Misdaadstatistieken in Sacramento CA"
+output: html_notebook
+---
+
+De vraag die inderzocht wordt is: wordt er op sommige dagen van de week in Sacramento meer geschoten dan op andere?
+
+Haal de data op en bekijk de structuur en kwaliteit.
+```{r}
+rawData <- read.csv("https://junar-temp.s3.amazonaws.com/2017-03-07/temp_3003195858542983786.csv?AWSAccessKeyId=AKIAI652OHJ6H2VI25OA&Expires=1488922093&Signature=UTKnt0s%2Bu0Rp52pzSHqGz3T8lyk%3D")
+
+str(rawData)
+summary(rawData)
+```
+
+Filter de data op soort(en) misdaad. Zet de dagen in de goede volgorde. Splits de tijd op in uren, minuten en seconden. Maak een draaitabel met aantal incidenten per dag van de week
+```{r}
+library(dplyr)
+library(tidyr)
+
+filterData <- filter(rawData, Description == "SHOTS FIRED - LESS THAN 15 AGO")
+
+levels(filterData$Day.of.Week)
+filterData$Day.of.Week = factor(filterData$Day.of.Week,levels(filterData$Day.of.Week)[c(2,6,7,5,1,3,4)])
+levels(filterData$Day.of.Week)
+table(filterData$Day.of.Week)
+
+filterData <- separate(filterData, Occurence.Time, c("Hour", "Minute", "Second"), sep = ":")
+table(filterData$Day.of.Week, filterData$Hour)
+```
+
+Groepeer de data set op dag en uur en tel het aantal incidenten per dag en uur. Visualiseer met een heatmap.
+```{r}
+byHour <- group_by(filterData, Day.of.Week, Hour)
+perHour   <- summarise(byHour, count = n())
+ggplot(data = perHour, aes(x = Day.of.Week, y = Hour)) +
+  geom_tile(aes(fill = count)) +
+  scale_fill_gradient(low="royalblue", high="red")
+```
+
