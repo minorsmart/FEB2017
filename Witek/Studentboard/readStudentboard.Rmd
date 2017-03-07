@@ -1,6 +1,8 @@
 ---
 title: "Entrepreneurial behaviour"
-output: html_notebook
+output:
+  html_document: default
+  html_notebook: default
 ---
 
 Participants of MSI are monitoring their entrepreneurial growth. They regularly reflect on their actions and record their behaviour via an online form.
@@ -23,7 +25,11 @@ url <- "https://docs.google.com/spreadsheets/d/1gq-DXkAf4QpZKcgQnABv634DKXjTCHep
 dfData <- gsheet2tbl(url)
 
 ## View the first few records
+<<<<<<< HEAD
+head(dfData,30)
+=======
 head(dfData,10)
+>>>>>>> 29af1cbd180a159689cd2d38393e19913e3b132b
 
 ## Explore the structure of the data set
 str(dfData)
@@ -72,8 +78,11 @@ In the following steps we are going to plot the data. The package we will use (`
 
 ```{r}
 meltMeans <- melt(newMeans)
+meltMeans <- filter(meltMeans, Naam.deelnemer == "Berg Frank van den")
 ```
 
+<<<<<<< HEAD
+=======
 Maybe it would be useful to be able to filter the data on date. For this we'll transform the Timestamp variable into a date format. As a test we'll filter on an arbitrary date and a selected name.
 
 ```{r}
@@ -84,11 +93,17 @@ filterMeans
 
 
 Now we can make a simple bar plot.
+>>>>>>> 29af1cbd180a159689cd2d38393e19913e3b132b
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 meanPlot <- ggplot(meltMeans) + 
   geom_col(aes(x = Timestamp, y = value, col = variable, fill = variable)) +
+<<<<<<< HEAD
+  theme(axis.text.x = element_text(angle=90)) 
+  
+=======
   theme(axis.text.x = element_text(angle=90))
+>>>>>>> 29af1cbd180a159689cd2d38393e19913e3b132b
 meanPlot
 ```
 
