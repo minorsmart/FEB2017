@@ -6,11 +6,12 @@ output: html_notebook
 De vraag die inderzocht wordt is: wordt er op sommige dagen van de week in Sacramento meer geschoten dan op andere?
 
 Haal de data op en bekijk de structuur en kwaliteit.
-```{r}
-rawData <- read.csv("https://junar-temp.s3.amazonaws.com/2017-03-07/temp_3003195858542983786.csv?AWSAccessKeyId=AKIAI652OHJ6H2VI25OA&Expires=1488922093&Signature=UTKnt0s%2Bu0Rp52pzSHqGz3T8lyk%3D")
+```{r, echo=TRUE}
+rawData <- read.csv("https://raw.githubusercontent.com/minorsmart/FEB2017/master/Witek/Crime/temp_1684002527564143312.csv")
 
 str(rawData)
 summary(rawData)
+head(rawData)
 ```
 
 Filter de data op soort(en) misdaad. Zet de dagen in de goede volgorde. Splits de tijd op in uren, minuten en seconden. Maak een draaitabel met aantal incidenten per dag van de week
@@ -31,6 +32,7 @@ table(filterData$Day.of.Week, filterData$Hour)
 
 Groepeer de data set op dag en uur en tel het aantal incidenten per dag en uur. Visualiseer met een heatmap.
 ```{r}
+library(ggplot2)
 byHour <- group_by(filterData, Day.of.Week, Hour)
 perHour   <- summarise(byHour, count = n())
 ggplot(data = perHour, aes(x = Day.of.Week, y = Hour)) +
