@@ -194,12 +194,37 @@ unlink(temp)</code></pre>
 <p>Now we have the data set in a data frame we can start preparing it for the model. We’ll first load some usefull packages and then look at the structure and quality of the data.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmxpYnJhcnkoY2FUb29scylcbmxpYnJhcnkoYmlnbG0pXG5saWJyYXJ5KGNhcmV0KVxuc3RyKGRhdGEpXG5gYGAifQ== -->
-<pre class="r"><code>library(dplyr)
-library(caTools)
-library(biglm)
-library(caret)
-str(data)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmBgYCJ9 -->
+<pre class="r"><code>library(dplyr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuIn0= -->
+<pre><code>
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYVRvb2xzKVxubGlicmFyeShiaWdsbSlcbmBgYCJ9 -->
+<pre class="r"><code>library(caTools)
+library(biglm)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBEQklcbiJ9 -->
+<pre><code>Loading required package: DBI</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShjYXJldClcbmBgYCJ9 -->
+<pre class="r"><code>library(caret)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBsYXR0aWNlXG5Mb2FkaW5nIHJlcXVpcmVkIHBhY2thZ2U6IGdncGxvdDJcbiJ9 -->
+<pre><code>Loading required package: lattice
+Loading required package: ggplot2</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RyKGRhdGEpXG5gYGAifQ== -->
+<pre class="r"><code>str(data)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiJ2RhdGEuZnJhbWUnOlx0MzAwMDAwIG9icy4gb2YgIDE1IHZhcmlhYmxlczpcbiAkIEFnZSAgICAgICAgICAgICAgICAgICAgOiBpbnQgIDE5IDI0IDQgNSAzOCA1IDQ2IDQgMjAgNTEgLi4uXG4gJCBHZW5kZXIgICAgICAgICAgICAgICAgIDogRmFjdG9yIHcvIDIgbGV2ZWxzIFwiRlwiLFwiTVwiOiAyIDEgMSAyIDIgMSAxIDEgMSAxIC4uLlxuICQgQXBwb2ludG1lbnRSZWdpc3RyYXRpb246IEZhY3RvciB3LyAyOTU0MjUgbGV2ZWxzIFwiMjAxMy0wNS0yOVQxNToxNDoxMVpcIiwuLjogMTUyMTEyIDI0ODIwMCAyMzA3MSA4NzI2OCAyNzQ2MTIgNzE1ODUgMjI1MzA1IDI0NDc0OSAxMjUxODQgNzAzNTQgLi4uXG4gJCBBcG9pbnRtZW50RGF0YSAgICAgICAgIDogRmFjdG9yIHcvIDUzNCBsZXZlbHMgXCIyMDE0LTAxLTAyVDAwOjAwOjAwWlwiLC4uOiAyOTAgNDQwIDM2IDE2NCA0OTAgMTUyIDQwOCA0NDIgMjMyIDEyNSAuLi5cbiAkIERheU9mVGhlV2VlayAgICAgICAgICAgOiBGYWN0b3Igdy8gNyBsZXZlbHMgXCJGcmlkYXlcIixcIk1vbmRheVwiLC4uOiA3IDcgNiA1IDYgNiA2IDEgNiA2IC4uLlxuICQgU3RhdHVzICAgICAgICAgICAgICAgICA6IEZhY3RvciB3LyAyIGxldmVscyBcIk5vLVNob3dcIixcIlNob3ctVXBcIjogMiAyIDIgMiAyIDEgMiAyIDIgMiAuLi5cbiAkIERpYWJldGVzICAgICAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDEgLi4uXG4gJCBBbGNvb2xpc20gICAgICAgICAgICAgIDogaW50ICAwIDAgMCAwIDAgMCAwIDAgMCAwIC4uLlxuICQgSGlwZXJUZW5zaW9uICAgICAgICAgICA6IGludCAgMCAwIDAgMCAwIDAgMCAwIDAgMSAuLi5cbiAkIEhhbmRjYXAgICAgICAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDAgLi4uXG4gJCBTbW9rZXMgICAgICAgICAgICAgICAgIDogaW50ICAwIDAgMCAwIDAgMCAwIDAgMCAwIC4uLlxuICQgU2Nob2xhcnNoaXAgICAgICAgICAgICA6IGludCAgMCAwIDAgMCAwIDAgMCAxIDAgMCAuLi5cbiAkIFR1YmVyY3Vsb3NpcyAgICAgICAgICAgOiBpbnQgIDAgMCAwIDAgMCAwIDAgMCAwIDAgLi4uXG4gJCBTbXNfUmVtaW5kZXIgICAgICAgICAgIDogaW50ICAwIDAgMCAxIDEgMSAxIDEgMCAxIC4uLlxuICQgQXdhaXRpbmdUaW1lICAgICAgICAgICA6IGludCAgLTI5IC0xIC0xIC0xNSAtNiAtMzUgLTE4IC0xNCAtMTQgLTQgLi4uXG4ifQ== -->
 <pre><code>'data.frame':   300000 obs. of  15 variables:
@@ -222,31 +247,39 @@ str(data)</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShkYXRhKVxuYGBgIn0= -->
 <pre class="r"><code>summary(data)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgQWdlICAgICAgICAgR2VuZGVyICAgICAgICAgICAgIEFwcG9pbnRtZW50UmVnaXN0cmF0aW9uICAgICAgICAgICAgICBBcG9pbnRtZW50RGF0YSAgICAgIERheU9mVGhlV2VlayAgXG4gTWluLiAgIDogLTIuMDAgICBGOjIwMDUwNSAgIDIwMTUtMDQtMTVUMTQ6MTk6MzRaOiAgICAgOSAgICAgMjAxNC0xMC0yMlQwMDowMDowMFo6ICAgNzU5ICAgRnJpZGF5ICAgOjUyNzcxICBcbiAxc3QgUXUuOiAxOS4wMCAgIE06IDk5NDk1ICAgMjAxNC0wMy0xOVQxNzoxMDoyMVo6ICAgICA4ICAgICAyMDE0LTA5LTAzVDAwOjAwOjAwWjogICA3NTYgICBNb25kYXkgICA6NTkyOTggIFxuIE1lZGlhbiA6IDM4LjAwICAgICAgICAgICAgICAyMDE0LTA3LTAzVDA4OjUwOjUwWjogICAgIDggICAgIDIwMTQtMTEtMjRUMDA6MDA6MDBaOiAgIDc1MiAgIFNhdHVyZGF5IDogMTM5MyAgXG4gTWVhbiAgIDogMzcuODEgICAgICAgICAgICAgIDIwMTUtMDUtMjdUMTM6NTc6MDlaOiAgICAgOCAgICAgMjAxNC0xMS0xOVQwMDowMDowMFo6ICAgNzQyICAgU3VuZGF5ICAgOiAgICA2ICBcbiAzcmQgUXUuOiA1Ni4wMCAgICAgICAgICAgICAgMjAxMy0xMi0yM1QxMjo0MDowMFo6ICAgICA3ICAgICAyMDE1LTA1LTI1VDAwOjAwOjAwWjogICA3NDEgICBUaHVyc2RheSA6NjAyNjIgIFxuIE1heC4gICA6MTEzLjAwICAgICAgICAgICAgICAyMDE0LTAxLTA3VDE1OjQyOjU3WjogICAgIDcgICAgIDIwMTQtMDktMjlUMDA6MDA6MDBaOiAgIDczOSAgIFR1ZXNkYXkgIDo2Mjc3NSAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIChPdGhlcikgICAgICAgICAgICAgOjI5OTk1MyAgICAgKE90aGVyKSAgICAgICAgICAgICA6Mjk1NTExICAgV2VkbmVzZGF5OjYzNDk1ICBcbiAgICAgU3RhdHVzICAgICAgICAgIERpYWJldGVzICAgICAgICAgQWxjb29saXNtICAgICAgICBIaXBlclRlbnNpb24gICAgICAgSGFuZGNhcCAgICAgICAgICAgIFNtb2tlcyAgICAgICBcbiBOby1TaG93OiA5MDczMSAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwICAgTWluLiAgIDowLjAwMDAwICAgTWluLiAgIDowLjAwMDAwICBcbiBTaG93LVVwOjIwOTI2OSAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwICAgMXN0IFF1LjowLjAwMDAwICAgMXN0IFF1LjowLjAwMDAwICBcbiAgICAgICAgICAgICAgICAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwICAgTWVkaWFuIDowLjAwMDAwICAgTWVkaWFuIDowLjAwMDAwICBcbiAgICAgICAgICAgICAgICAgIE1lYW4gICA6MC4wNzc5NyAgIE1lYW4gICA6MC4wMjUwMSAgIE1lYW4gICA6MC4yMTU5ICAgTWVhbiAgIDowLjAyMDUyICAgTWVhbiAgIDowLjA1MjM3ICBcbiAgICAgICAgICAgICAgICAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwICAgM3JkIFF1LjowLjAwMDAwICAgM3JkIFF1LjowLjAwMDAwICBcbiAgICAgICAgICAgICAgICAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6MS4wMDAwICAgTWF4LiAgIDo0LjAwMDAwICAgTWF4LiAgIDoxLjAwMDAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgU2Nob2xhcnNoaXAgICAgICBUdWJlcmN1bG9zaXMgICAgICBTbXNfUmVtaW5kZXIgICAgIEF3YWl0aW5nVGltZSAgICBcbiBNaW4uICAgOjAuMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwICAgTWluLiAgIDotMzk4LjAwICBcbiAxc3QgUXUuOjAuMDAwMCAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwICAgMXN0IFF1LjogLTIwLjAwICBcbiBNZWRpYW4gOjAuMDAwMCAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MS4wMDAwICAgTWVkaWFuIDogIC04LjAwICBcbiBNZWFuICAgOjAuMDk2OSAgIE1lYW4gICA6MC4wMDA0NSAgIE1lYW4gICA6MC41NzQyICAgTWVhbiAgIDogLTEzLjg0ICBcbiAzcmQgUXUuOjAuMDAwMCAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MS4wMDAwICAgM3JkIFF1LjogIC00LjAwICBcbiBNYXguICAgOjEuMDAwMCAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6Mi4wMDAwICAgTWF4LiAgIDogIC0xLjAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
-<pre><code>      Age         Gender             AppointmentRegistration              ApointmentData      DayOfTheWeek  
- Min.   : -2.00   F:200505   2015-04-15T14:19:34Z:     9     2014-10-22T00:00:00Z:   759   Friday   :52771  
- 1st Qu.: 19.00   M: 99495   2014-03-19T17:10:21Z:     8     2014-09-03T00:00:00Z:   756   Monday   :59298  
- Median : 38.00              2014-07-03T08:50:50Z:     8     2014-11-24T00:00:00Z:   752   Saturday : 1393  
- Mean   : 37.81              2015-05-27T13:57:09Z:     8     2014-11-19T00:00:00Z:   742   Sunday   :    6  
- 3rd Qu.: 56.00              2013-12-23T12:40:00Z:     7     2015-05-25T00:00:00Z:   741   Thursday :60262  
- Max.   :113.00              2014-01-07T15:42:57Z:     7     2014-09-29T00:00:00Z:   739   Tuesday  :62775  
-                             (Other)             :299953     (Other)             :295511   Wednesday:63495  
-     Status          Diabetes         Alcoolism        HiperTension       Handcap            Smokes       
- No-Show: 90731   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000   Min.   :0.00000   Min.   :0.00000  
- Show-Up:209269   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.00000  
-                  Median :0.00000   Median :0.00000   Median :0.0000   Median :0.00000   Median :0.00000  
-                  Mean   :0.07797   Mean   :0.02501   Mean   :0.2159   Mean   :0.02052   Mean   :0.05237  
-                  3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.00000   3rd Qu.:0.00000  
-                  Max.   :1.00000   Max.   :1.00000   Max.   :1.0000   Max.   :4.00000   Max.   :1.00000  
-                                                                                                          
-  Scholarship      Tuberculosis      Sms_Reminder     AwaitingTime    
- Min.   :0.0000   Min.   :0.00000   Min.   :0.0000   Min.   :-398.00  
- 1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.: -20.00  
- Median :0.0000   Median :0.00000   Median :1.0000   Median :  -8.00  
- Mean   :0.0969   Mean   :0.00045   Mean   :0.5742   Mean   : -13.84  
- 3rd Qu.:0.0000   3rd Qu.:0.00000   3rd Qu.:1.0000   3rd Qu.:  -4.00  
- Max.   :1.0000   Max.   :1.00000   Max.   :2.0000   Max.   :  -1.00  
-                                                                      </code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgQWdlICAgICAgICAgR2VuZGVyICAgICAgICAgICAgIEFwcG9pbnRtZW50UmVnaXN0cmF0aW9uICAgICAgICAgICAgICBBcG9pbnRtZW50RGF0YSAgXG4gTWluLiAgIDogLTIuMDAgICBGOjIwMDUwNSAgIDIwMTUtMDQtMTVUMTQ6MTk6MzRaOiAgICAgOSAgICAgMjAxNC0xMC0yMlQwMDowMDowMFo6ICAgNzU5ICBcbiAxc3QgUXUuOiAxOS4wMCAgIE06IDk5NDk1ICAgMjAxNC0wMy0xOVQxNzoxMDoyMVo6ICAgICA4ICAgICAyMDE0LTA5LTAzVDAwOjAwOjAwWjogICA3NTYgIFxuIE1lZGlhbiA6IDM4LjAwICAgICAgICAgICAgICAyMDE0LTA3LTAzVDA4OjUwOjUwWjogICAgIDggICAgIDIwMTQtMTEtMjRUMDA6MDA6MDBaOiAgIDc1MiAgXG4gTWVhbiAgIDogMzcuODEgICAgICAgICAgICAgIDIwMTUtMDUtMjdUMTM6NTc6MDlaOiAgICAgOCAgICAgMjAxNC0xMS0xOVQwMDowMDowMFo6ICAgNzQyICBcbiAzcmQgUXUuOiA1Ni4wMCAgICAgICAgICAgICAgMjAxMy0xMi0yM1QxMjo0MDowMFo6ICAgICA3ICAgICAyMDE1LTA1LTI1VDAwOjAwOjAwWjogICA3NDEgIFxuIE1heC4gICA6MTEzLjAwICAgICAgICAgICAgICAyMDE0LTAxLTA3VDE1OjQyOjU3WjogICAgIDcgICAgIDIwMTQtMDktMjlUMDA6MDA6MDBaOiAgIDczOSAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIChPdGhlcikgICAgICAgICAgICAgOjI5OTk1MyAgICAgKE90aGVyKSAgICAgICAgICAgICA6Mjk1NTExICBcbiAgICBEYXlPZlRoZVdlZWsgICAgICAgU3RhdHVzICAgICAgICAgIERpYWJldGVzICAgICAgICAgQWxjb29saXNtICAgICAgICBIaXBlclRlbnNpb24gICBcbiBGcmlkYXkgICA6NTI3NzEgICBOby1TaG93OiA5MDczMSAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwICBcbiBNb25kYXkgICA6NTkyOTggICBTaG93LVVwOjIwOTI2OSAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwICBcbiBTYXR1cmRheSA6IDEzOTMgICAgICAgICAgICAgICAgICAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwICBcbiBTdW5kYXkgICA6ICAgIDYgICAgICAgICAgICAgICAgICAgIE1lYW4gICA6MC4wNzc5NyAgIE1lYW4gICA6MC4wMjUwMSAgIE1lYW4gICA6MC4yMTU5ICBcbiBUaHVyc2RheSA6NjAyNjIgICAgICAgICAgICAgICAgICAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwICBcbiBUdWVzZGF5ICA6NjI3NzUgICAgICAgICAgICAgICAgICAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6MS4wMDAwICBcbiBXZWRuZXNkYXk6NjM0OTUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICBIYW5kY2FwICAgICAgICAgICAgU21va2VzICAgICAgICAgU2Nob2xhcnNoaXAgICAgICBUdWJlcmN1bG9zaXMgICAgICBTbXNfUmVtaW5kZXIgICBcbiBNaW4uICAgOjAuMDAwMDAgICBNaW4uICAgOjAuMDAwMDAgICBNaW4uICAgOjAuMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwICBcbiAxc3QgUXUuOjAuMDAwMDAgICAxc3QgUXUuOjAuMDAwMDAgICAxc3QgUXUuOjAuMDAwMCAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwICBcbiBNZWRpYW4gOjAuMDAwMDAgICBNZWRpYW4gOjAuMDAwMDAgICBNZWRpYW4gOjAuMDAwMCAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MS4wMDAwICBcbiBNZWFuICAgOjAuMDIwNTIgICBNZWFuICAgOjAuMDUyMzcgICBNZWFuICAgOjAuMDk2OSAgIE1lYW4gICA6MC4wMDA0NSAgIE1lYW4gICA6MC41NzQyICBcbiAzcmQgUXUuOjAuMDAwMDAgICAzcmQgUXUuOjAuMDAwMDAgICAzcmQgUXUuOjAuMDAwMCAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MS4wMDAwICBcbiBNYXguICAgOjQuMDAwMDAgICBNYXguICAgOjEuMDAwMDAgICBNYXguICAgOjEuMDAwMCAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6Mi4wMDAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgQXdhaXRpbmdUaW1lICAgIFxuIE1pbi4gICA6LTM5OC4wMCAgXG4gMXN0IFF1LjogLTIwLjAwICBcbiBNZWRpYW4gOiAgLTguMDAgIFxuIE1lYW4gICA6IC0xMy44NCAgXG4gM3JkIFF1LjogIC00LjAwICBcbiBNYXguICAgOiAgLTEuMDAgIFxuICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code>      Age         Gender             AppointmentRegistration              ApointmentData  
+ Min.   : -2.00   F:200505   2015-04-15T14:19:34Z:     9     2014-10-22T00:00:00Z:   759  
+ 1st Qu.: 19.00   M: 99495   2014-03-19T17:10:21Z:     8     2014-09-03T00:00:00Z:   756  
+ Median : 38.00              2014-07-03T08:50:50Z:     8     2014-11-24T00:00:00Z:   752  
+ Mean   : 37.81              2015-05-27T13:57:09Z:     8     2014-11-19T00:00:00Z:   742  
+ 3rd Qu.: 56.00              2013-12-23T12:40:00Z:     7     2015-05-25T00:00:00Z:   741  
+ Max.   :113.00              2014-01-07T15:42:57Z:     7     2014-09-29T00:00:00Z:   739  
+                             (Other)             :299953     (Other)             :295511  
+    DayOfTheWeek       Status          Diabetes         Alcoolism        HiperTension   
+ Friday   :52771   No-Show: 90731   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000  
+ Monday   :59298   Show-Up:209269   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000  
+ Saturday : 1393                    Median :0.00000   Median :0.00000   Median :0.0000  
+ Sunday   :    6                    Mean   :0.07797   Mean   :0.02501   Mean   :0.2159  
+ Thursday :60262                    3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000  
+ Tuesday  :62775                    Max.   :1.00000   Max.   :1.00000   Max.   :1.0000  
+ Wednesday:63495                                                                        
+    Handcap            Smokes         Scholarship      Tuberculosis      Sms_Reminder   
+ Min.   :0.00000   Min.   :0.00000   Min.   :0.0000   Min.   :0.00000   Min.   :0.0000  
+ 1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.0000  
+ Median :0.00000   Median :0.00000   Median :0.0000   Median :0.00000   Median :1.0000  
+ Mean   :0.02052   Mean   :0.05237   Mean   :0.0969   Mean   :0.00045   Mean   :0.5742  
+ 3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.00000   3rd Qu.:1.0000  
+ Max.   :4.00000   Max.   :1.00000   Max.   :1.0000   Max.   :1.00000   Max.   :2.0000  
+                                                                                        
+  AwaitingTime    
+ Min.   :-398.00  
+ 1st Qu.: -20.00  
+ Median :  -8.00  
+ Mean   : -13.84  
+ 3rd Qu.:  -4.00  
+ Max.   :  -1.00  
+                  </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -281,23 +314,31 @@ str(data)</code></pre>
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtbWFyeShkYXRhKVxuYGBgIn0= -->
 <pre class="r"><code>summary(data)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgQWdlICAgICAgICBHZW5kZXIgICAgICAgIERheU9mVGhlV2VlayAgICAgICBTdGF0dXMgICAgICAgICAgRGlhYmV0ZXMgICAgICAgICBBbGNvb2xpc20gICAgICAgIEhpcGVyVGVuc2lvbiAgIFxuIE1pbi4gICA6IDYuMDAgICBGOjE4Njk3MiAgIEZyaWRheSAgIDo0ODA1MCAgIE1pbi4gICA6MC4wMDAwICAgTWluLiAgIDowLjAwMDAwICAgTWluLiAgIDowLjAwMDAwICAgTWluLiAgIDowLjAwMDAgIFxuIDFzdCBRdS46MjQuMDAgICBNOiA4NTA5OCAgIE1vbmRheSAgIDo1Mzc5NiAgIDFzdCBRdS46MC4wMDAwICAgMXN0IFF1LjowLjAwMDAwICAgMXN0IFF1LjowLjAwMDAwICAgMXN0IFF1LjowLjAwMDAgIFxuIE1lZGlhbiA6NDIuMDAgICAgICAgICAgICAgIFNhdHVyZGF5IDogMTM1MiAgIE1lZGlhbiA6MS4wMDAwICAgTWVkaWFuIDowLjAwMDAwICAgTWVkaWFuIDowLjAwMDAwICAgTWVkaWFuIDowLjAwMDAgIFxuIE1lYW4gICA6NDEuNDEgICAgICAgICAgICAgIFN1bmRheSAgIDogICAgNiAgIE1lYW4gICA6MC42OTk4ICAgTWVhbiAgIDowLjA4NTc4ICAgTWVhbiAgIDowLjAyNzU0ICAgTWVhbiAgIDowLjIzNzUgIFxuIDNyZCBRdS46NTcuMDAgICAgICAgICAgICAgIFRodXJzZGF5IDo1NDI1OSAgIDNyZCBRdS46MS4wMDAwICAgM3JkIFF1LjowLjAwMDAwICAgM3JkIFF1LjowLjAwMDAwICAgM3JkIFF1LjowLjAwMDAgIFxuIE1heC4gICA6OTQuMDAgICAgICAgICAgICAgIFR1ZXNkYXkgIDo1NzA0MiAgIE1heC4gICA6MS4wMDAwICAgTWF4LiAgIDoxLjAwMDAwICAgTWF4LiAgIDoxLjAwMDAwICAgTWF4LiAgIDoxLjAwMDAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIFdlZG5lc2RheTo1NzU2NSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgIEhhbmRjYXAgICAgICAgICAgICBTbW9rZXMgICAgICAgICBTY2hvbGFyc2hpcCAgICAgIFR1YmVyY3Vsb3NpcyAgICAgICAgU21zX1JlbWluZGVyICAgIEF3YWl0aW5nVGltZSAgIFxuIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgIE1pbi4gICA6MC4wMDAwICAgTWluLiAgIDowLjAwMDAwMDAgICBNaW4uICAgOjAuMDAwICAgTWluLiAgIDotMzk4LjAgIFxuIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwMCAgIDFzdCBRdS46MC4wMDAwICAgMXN0IFF1LjowLjAwMDAwMDAgICAxc3QgUXUuOjAuMDAwICAgMXN0IFF1LjogLTIwLjAgIFxuIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwMCAgIE1lZGlhbiA6MC4wMDAwICAgTWVkaWFuIDowLjAwMDAwMDAgICBNZWRpYW4gOjEuMDAwICAgTWVkaWFuIDogIC04LjAgIFxuIE1lYW4gICA6MC4wMjIxMiAgIE1lYW4gICA6MC4wNTc3MiAgIE1lYW4gICA6MC4wOTg3ICAgTWVhbiAgIDowLjAwMDQ3NzggICBNZWFuICAgOjAuNTczICAgTWVhbiAgIDogLTEzLjcgIFxuIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwMCAgIDNyZCBRdS46MC4wMDAwICAgM3JkIFF1LjowLjAwMDAwMDAgICAzcmQgUXUuOjEuMDAwICAgM3JkIFF1LjogIC00LjAgIFxuIE1heC4gICA6NC4wMDAwMCAgIE1heC4gICA6MS4wMDAwMCAgIE1heC4gICA6MS4wMDAwICAgTWF4LiAgIDoxLjAwMDAwMDAgICBNYXguICAgOjIuMDAwICAgTWF4LiAgIDogIC0xLjAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
-<pre><code>      Age        Gender        DayOfTheWeek       Status          Diabetes         Alcoolism        HiperTension   
- Min.   : 6.00   F:186972   Friday   :48050   Min.   :0.0000   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000  
- 1st Qu.:24.00   M: 85098   Monday   :53796   1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000  
- Median :42.00              Saturday : 1352   Median :1.0000   Median :0.00000   Median :0.00000   Median :0.0000  
- Mean   :41.41              Sunday   :    6   Mean   :0.6998   Mean   :0.08578   Mean   :0.02754   Mean   :0.2375  
- 3rd Qu.:57.00              Thursday :54259   3rd Qu.:1.0000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000  
- Max.   :94.00              Tuesday  :57042   Max.   :1.0000   Max.   :1.00000   Max.   :1.00000   Max.   :1.0000  
-                            Wednesday:57565                                                                        
-    Handcap            Smokes         Scholarship      Tuberculosis        Sms_Reminder    AwaitingTime   
- Min.   :0.00000   Min.   :0.00000   Min.   :0.0000   Min.   :0.0000000   Min.   :0.000   Min.   :-398.0  
- 1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.0000000   1st Qu.:0.000   1st Qu.: -20.0  
- Median :0.00000   Median :0.00000   Median :0.0000   Median :0.0000000   Median :1.000   Median :  -8.0  
- Mean   :0.02212   Mean   :0.05772   Mean   :0.0987   Mean   :0.0004778   Mean   :0.573   Mean   : -13.7  
- 3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.0000000   3rd Qu.:1.000   3rd Qu.:  -4.0  
- Max.   :4.00000   Max.   :1.00000   Max.   :1.0000   Max.   :1.0000000   Max.   :2.000   Max.   :  -1.0  
-                                                                                                          </code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgQWdlICAgICAgICBHZW5kZXIgICAgICAgIERheU9mVGhlV2VlayAgICAgICBTdGF0dXMgICAgICAgICAgRGlhYmV0ZXMgICAgICBcbiBNaW4uICAgOiA2LjAwICAgRjoxODY5NzIgICBGcmlkYXkgICA6NDgwNTAgICBNaW4uICAgOjAuMDAwMCAgIE1pbi4gICA6MC4wMDAwMCAgXG4gMXN0IFF1LjoyNC4wMCAgIE06IDg1MDk4ICAgTW9uZGF5ICAgOjUzNzk2ICAgMXN0IFF1LjowLjAwMDAgICAxc3QgUXUuOjAuMDAwMDAgIFxuIE1lZGlhbiA6NDIuMDAgICAgICAgICAgICAgIFNhdHVyZGF5IDogMTM1MiAgIE1lZGlhbiA6MS4wMDAwICAgTWVkaWFuIDowLjAwMDAwICBcbiBNZWFuICAgOjQxLjQxICAgICAgICAgICAgICBTdW5kYXkgICA6ICAgIDYgICBNZWFuICAgOjAuNjk5OCAgIE1lYW4gICA6MC4wODU3OCAgXG4gM3JkIFF1Ljo1Ny4wMCAgICAgICAgICAgICAgVGh1cnNkYXkgOjU0MjU5ICAgM3JkIFF1LjoxLjAwMDAgICAzcmQgUXUuOjAuMDAwMDAgIFxuIE1heC4gICA6OTQuMDAgICAgICAgICAgICAgIFR1ZXNkYXkgIDo1NzA0MiAgIE1heC4gICA6MS4wMDAwICAgTWF4LiAgIDoxLjAwMDAwICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBXZWRuZXNkYXk6NTc1NjUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICBBbGNvb2xpc20gICAgICAgIEhpcGVyVGVuc2lvbiAgICAgICBIYW5kY2FwICAgICAgICAgICAgU21va2VzICAgICAgICAgU2Nob2xhcnNoaXAgICAgXG4gTWluLiAgIDowLjAwMDAwICAgTWluLiAgIDowLjAwMDAgICBNaW4uICAgOjAuMDAwMDAgICBNaW4uICAgOjAuMDAwMDAgICBNaW4uICAgOjAuMDAwMCAgXG4gMXN0IFF1LjowLjAwMDAwICAgMXN0IFF1LjowLjAwMDAgICAxc3QgUXUuOjAuMDAwMDAgICAxc3QgUXUuOjAuMDAwMDAgICAxc3QgUXUuOjAuMDAwMCAgXG4gTWVkaWFuIDowLjAwMDAwICAgTWVkaWFuIDowLjAwMDAgICBNZWRpYW4gOjAuMDAwMDAgICBNZWRpYW4gOjAuMDAwMDAgICBNZWRpYW4gOjAuMDAwMCAgXG4gTWVhbiAgIDowLjAyNzU0ICAgTWVhbiAgIDowLjIzNzUgICBNZWFuICAgOjAuMDIyMTIgICBNZWFuICAgOjAuMDU3NzIgICBNZWFuICAgOjAuMDk4NyAgXG4gM3JkIFF1LjowLjAwMDAwICAgM3JkIFF1LjowLjAwMDAgICAzcmQgUXUuOjAuMDAwMDAgICAzcmQgUXUuOjAuMDAwMDAgICAzcmQgUXUuOjAuMDAwMCAgXG4gTWF4LiAgIDoxLjAwMDAwICAgTWF4LiAgIDoxLjAwMDAgICBNYXguICAgOjQuMDAwMDAgICBNYXguICAgOjEuMDAwMDAgICBNYXguICAgOjEuMDAwMCAgXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gIFR1YmVyY3Vsb3NpcyAgICAgICAgU21zX1JlbWluZGVyICAgIEF3YWl0aW5nVGltZSAgIFxuIE1pbi4gICA6MC4wMDAwMDAwICAgTWluLiAgIDowLjAwMCAgIE1pbi4gICA6LTM5OC4wICBcbiAxc3QgUXUuOjAuMDAwMDAwMCAgIDFzdCBRdS46MC4wMDAgICAxc3QgUXUuOiAtMjAuMCAgXG4gTWVkaWFuIDowLjAwMDAwMDAgICBNZWRpYW4gOjEuMDAwICAgTWVkaWFuIDogIC04LjAgIFxuIE1lYW4gICA6MC4wMDA0Nzc4ICAgTWVhbiAgIDowLjU3MyAgIE1lYW4gICA6IC0xMy43ICBcbiAzcmQgUXUuOjAuMDAwMDAwMCAgIDNyZCBRdS46MS4wMDAgICAzcmQgUXUuOiAgLTQuMCAgXG4gTWF4LiAgIDoxLjAwMDAwMDAgICBNYXguICAgOjIuMDAwICAgTWF4LiAgIDogIC0xLjAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
+<pre><code>      Age        Gender        DayOfTheWeek       Status          Diabetes      
+ Min.   : 6.00   F:186972   Friday   :48050   Min.   :0.0000   Min.   :0.00000  
+ 1st Qu.:24.00   M: 85098   Monday   :53796   1st Qu.:0.0000   1st Qu.:0.00000  
+ Median :42.00              Saturday : 1352   Median :1.0000   Median :0.00000  
+ Mean   :41.41              Sunday   :    6   Mean   :0.6998   Mean   :0.08578  
+ 3rd Qu.:57.00              Thursday :54259   3rd Qu.:1.0000   3rd Qu.:0.00000  
+ Max.   :94.00              Tuesday  :57042   Max.   :1.0000   Max.   :1.00000  
+                            Wednesday:57565                                     
+   Alcoolism        HiperTension       Handcap            Smokes         Scholarship    
+ Min.   :0.00000   Min.   :0.0000   Min.   :0.00000   Min.   :0.00000   Min.   :0.0000  
+ 1st Qu.:0.00000   1st Qu.:0.0000   1st Qu.:0.00000   1st Qu.:0.00000   1st Qu.:0.0000  
+ Median :0.00000   Median :0.0000   Median :0.00000   Median :0.00000   Median :0.0000  
+ Mean   :0.02754   Mean   :0.2375   Mean   :0.02212   Mean   :0.05772   Mean   :0.0987  
+ 3rd Qu.:0.00000   3rd Qu.:0.0000   3rd Qu.:0.00000   3rd Qu.:0.00000   3rd Qu.:0.0000  
+ Max.   :1.00000   Max.   :1.0000   Max.   :4.00000   Max.   :1.00000   Max.   :1.0000  
+                                                                                        
+  Tuberculosis        Sms_Reminder    AwaitingTime   
+ Min.   :0.0000000   Min.   :0.000   Min.   :-398.0  
+ 1st Qu.:0.0000000   1st Qu.:0.000   1st Qu.: -20.0  
+ Median :0.0000000   Median :1.000   Median :  -8.0  
+ Mean   :0.0004778   Mean   :0.573   Mean   : -13.7  
+ 3rd Qu.:0.0000000   3rd Qu.:1.000   3rd Qu.:  -4.0  
+ Max.   :1.0000000   Max.   :2.000   Max.   :  -1.0  
+                                                     </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -318,49 +359,49 @@ test &lt;- subset(data, data$spl==FALSE)</code></pre>
 <pre class="r"><code>model &lt;- glm (Status ~ . -spl, data = train, family = binomial)
 summary(model)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSBTdGF0dXMgfiAuIC0gc3BsLCBmYW1pbHkgPSBiaW5vbWlhbCwgZGF0YSA9IHRyYWluKVxuXG5EZXZpYW5jZSBSZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgICAxUSAgIE1lZGlhbiAgICAgICAzUSAgICAgIE1heCAgXG4tMS45NzQyICAtMS4zOTM2ICAgMC43NTUwICAgMC44NzQ2ICAgMi4zOTkyICBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgICAgICAgICAgICAwLjQ2ODM0NTUgIDAuMDE3NzY2OSAgMjYuMzYwICA8IDJlLTE2ICoqKlxuQWdlICAgICAgICAgICAgICAgICAgICAwLjAxMjI4NDggIDAuMDAwMjk0MCAgNDEuNzkwICA8IDJlLTE2ICoqKlxuR2VuZGVyTSAgICAgICAgICAgICAgIC0wLjAyNjY0MDEgIDAuMDExMDg5OSAgLTIuNDAyIDAuMDE2Mjk3ICogIFxuRGF5T2ZUaGVXZWVrTW9uZGF5ICAgIC0wLjA2OTQ1OTUgIDAuMDE2NTc1OSAgLTQuMTkwIDIuNzhlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrU2F0dXJkYXkgIC0wLjQ1Nzk1NjYgIDAuMDY4MDI4MyAgLTYuNzMyIDEuNjhlLTExICoqKlxuRGF5T2ZUaGVXZWVrU3VuZGF5ICAgICA3LjQ5NTQ1NTMgMjUuMzIyMjY3NyAgIDAuMjk2IDAuNzY3MjI4ICAgIFxuRGF5T2ZUaGVXZWVrVGh1cnNkYXkgICAwLjA0NjAyMTcgIDAuMDE2NDk1NyAgIDIuNzkwIDAuMDA1MjcyICoqIFxuRGF5T2ZUaGVXZWVrVHVlc2RheSAgICAwLjA2ODIwNzEgIDAuMDE2NDcxNSAgIDQuMTQxIDMuNDZlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrV2VkbmVzZGF5ICAwLjAzMDQzOTAgIDAuMDE2MjczNSAgIDEuODcwIDAuMDYxNDE5IC4gIFxuRGlhYmV0ZXMgICAgICAgICAgICAgIC0wLjA0MzE4NDEgIDAuMDIwOTI1NyAgLTIuMDY0IDAuMDM5MDQ4ICogIFxuQWxjb29saXNtICAgICAgICAgICAgIC0wLjMwNDIzOTkgIDAuMDMyNDUwNSAgLTkuMzc2ICA8IDJlLTE2ICoqKlxuSGlwZXJUZW5zaW9uICAgICAgICAgICAwLjA1MTY3NDIgIDAuMDE1MTMxNiAgIDMuNDE1IDAuMDAwNjM4ICoqKlxuSGFuZGNhcCAgICAgICAgICAgICAgIC0wLjAxNjI3MTMgIDAuMDMxOTU0MCAgLTAuNTA5IDAuNjEwNjA0ICAgIFxuU21va2VzICAgICAgICAgICAgICAgIC0wLjIzNDIwMjkgIDAuMDIyOTA0MCAtMTAuMjI1ICA8IDJlLTE2ICoqKlxuU2Nob2xhcnNoaXAgICAgICAgICAgIC0wLjE4Mjk2MTcgIDAuMDE2NjU2MCAtMTAuOTg1ICA8IDJlLTE2ICoqKlxuVHViZXJjdWxvc2lzICAgICAgICAgIC0wLjAxNzk4NzkgIDAuMjI1OTAyNiAgLTAuMDgwIDAuOTM2NTM0ICAgIFxuU21zX1JlbWluZGVyICAgICAgICAgICAwLjEwNjgzMTUgIDAuMDEwNjQ1NSAgMTAuMDM1ICA8IDJlLTE2ICoqKlxuQXdhaXRpbmdUaW1lICAgICAgICAgICAwLjAxMDY0NjcgIDAuMDAwMzI3MyAgMzIuNTI2ICA8IDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgYmlub21pYWwgZmFtaWx5IHRha2VuIHRvIGJlIDEpXG5cbiAgICBOdWxsIGRldmlhbmNlOiAyMzI3NTIgIG9uIDE5MDQ0OCAgZGVncmVlcyBvZiBmcmVlZG9tXG5SZXNpZHVhbCBkZXZpYW5jZTogMjI4NjA3ICBvbiAxOTA0MzEgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiAyMjg2NDNcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDdcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5DYWxsOlxuZ2xtKGZvcm11bGEgPSBTdGF0dXMgfiAuIC0gc3BsLCBmYW1pbHkgPSBiaW5vbWlhbCwgZGF0YSA9IHRyYWluKVxuXG5EZXZpYW5jZSBSZXNpZHVhbHM6IFxuICAgIE1pbiAgICAgICAxUSAgIE1lZGlhbiAgICAgICAzUSAgICAgIE1heCAgXG4tMS45NzA0ICAtMS4zOTU0ICAgMC43NTYyICAgMC44NzM1ICAgMi40MTI2ICBcblxuQ29lZmZpY2llbnRzOlxuICAgICAgICAgICAgICAgICAgICAgICAgRXN0aW1hdGUgU3RkLiBFcnJvciB6IHZhbHVlIFByKD58enwpICAgIFxuKEludGVyY2VwdCkgICAgICAgICAgICAwLjQ4NDM4NjAgIDAuMDE3Nzg2MSAgMjcuMjM0ICA8IDJlLTE2ICoqKlxuQWdlICAgICAgICAgICAgICAgICAgICAwLjAxMjA5OTYgIDAuMDAwMjkzNyAgNDEuMjAzICA8IDJlLTE2ICoqKlxuR2VuZGVyTSAgICAgICAgICAgICAgIC0wLjAzMTkxNjEgIDAuMDExMDc1NyAgLTIuODgyICAwLjAwMzk2ICoqIFxuRGF5T2ZUaGVXZWVrTW9uZGF5ICAgIC0wLjA3Mjk2NjEgIDAuMDE2NTc1OCAgLTQuNDAyIDEuMDdlLTA1ICoqKlxuRGF5T2ZUaGVXZWVrU2F0dXJkYXkgIC0wLjM2MzU3NzMgIDAuMDY5NDcwNiAgLTUuMjM0IDEuNjZlLTA3ICoqKlxuRGF5T2ZUaGVXZWVrU3VuZGF5ICAgICAwLjIwNDc2NzggIDEuMTU5NTA1OCAgIDAuMTc3ICAwLjg1OTgyICAgIFxuRGF5T2ZUaGVXZWVrVGh1cnNkYXkgICAwLjAzOTc2NTkgIDAuMDE2NDgyNiAgIDIuNDEzICAwLjAxNTg0ICogIFxuRGF5T2ZUaGVXZWVrVHVlc2RheSAgICAwLjA3Mjc4OTcgIDAuMDE2NDc3OSAgIDQuNDE3IDkuOTllLTA2ICoqKlxuRGF5T2ZUaGVXZWVrV2VkbmVzZGF5ICAwLjAyMjgzMzMgIDAuMDE2Mjc4MyAgIDEuNDAzICAwLjE2MDcxICAgIFxuRGlhYmV0ZXMgICAgICAgICAgICAgIC0wLjAzMTE0MjUgIDAuMDIwOTI5NiAgLTEuNDg4ICAwLjEzNjc2ICAgIFxuQWxjb29saXNtICAgICAgICAgICAgIC0wLjMwNDkzNzUgIDAuMDMyMTgzMyAgLTkuNDc1ICA8IDJlLTE2ICoqKlxuSGlwZXJUZW5zaW9uICAgICAgICAgICAwLjA0NjAzMTIgIDAuMDE1MTA2OSAgIDMuMDQ3ICAwLjAwMjMxICoqIFxuSGFuZGNhcCAgICAgICAgICAgICAgIC0wLjAxODg5NzUgIDAuMDMxOTUwNSAgLTAuNTkxICAwLjU1NDIxICAgIFxuU21va2VzICAgICAgICAgICAgICAgIC0wLjI0MTQ4NTAgIDAuMDIyODM4OCAtMTAuNTczICA8IDJlLTE2ICoqKlxuU2Nob2xhcnNoaXAgICAgICAgICAgIC0wLjE3MzU1NzAgIDAuMDE2NjU4MSAtMTAuNDE5ICA8IDJlLTE2ICoqKlxuVHViZXJjdWxvc2lzICAgICAgICAgICAwLjA1NDA0ODYgIDAuMjMwMDM0MyAgIDAuMjM1ICAwLjgxNDI0ICAgIFxuU21zX1JlbWluZGVyICAgICAgICAgICAwLjEwMDkxMjMgIDAuMDEwNjUyNyAgIDkuNDczICA8IDJlLTE2ICoqKlxuQXdhaXRpbmdUaW1lICAgICAgICAgICAwLjAxMDc1ODggIDAuMDAwMzI5OCAgMzIuNjIzICA8IDJlLTE2ICoqKlxuLS0tXG5TaWduaWYuIGNvZGVzOiAgMCDigJgqKirigJkgMC4wMDEg4oCYKirigJkgMC4wMSDigJgq4oCZIDAuMDUg4oCYLuKAmSAwLjEg4oCYIOKAmSAxXG5cbihEaXNwZXJzaW9uIHBhcmFtZXRlciBmb3IgYmlub21pYWwgZmFtaWx5IHRha2VuIHRvIGJlIDEpXG5cbiAgICBOdWxsIGRldmlhbmNlOiAyMzI3NTIgIG9uIDE5MDQ0OCAgZGVncmVlcyBvZiBmcmVlZG9tXG5SZXNpZHVhbCBkZXZpYW5jZTogMjI4NjgyICBvbiAxOTA0MzEgIGRlZ3JlZXMgb2YgZnJlZWRvbVxuQUlDOiAyMjg3MThcblxuTnVtYmVyIG9mIEZpc2hlciBTY29yaW5nIGl0ZXJhdGlvbnM6IDRcbiJ9 -->
 <pre><code>
 Call:
 glm(formula = Status ~ . - spl, family = binomial, data = train)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--1.9742  -1.3936   0.7550   0.8746   2.3992  
+-1.9704  -1.3954   0.7562   0.8735   2.4126  
 
 Coefficients:
                         Estimate Std. Error z value Pr(&gt;|z|)    
-(Intercept)            0.4683455  0.0177669  26.360  &lt; 2e-16 ***
-Age                    0.0122848  0.0002940  41.790  &lt; 2e-16 ***
-GenderM               -0.0266401  0.0110899  -2.402 0.016297 *  
-DayOfTheWeekMonday    -0.0694595  0.0165759  -4.190 2.78e-05 ***
-DayOfTheWeekSaturday  -0.4579566  0.0680283  -6.732 1.68e-11 ***
-DayOfTheWeekSunday     7.4954553 25.3222677   0.296 0.767228    
-DayOfTheWeekThursday   0.0460217  0.0164957   2.790 0.005272 ** 
-DayOfTheWeekTuesday    0.0682071  0.0164715   4.141 3.46e-05 ***
-DayOfTheWeekWednesday  0.0304390  0.0162735   1.870 0.061419 .  
-Diabetes              -0.0431841  0.0209257  -2.064 0.039048 *  
-Alcoolism             -0.3042399  0.0324505  -9.376  &lt; 2e-16 ***
-HiperTension           0.0516742  0.0151316   3.415 0.000638 ***
-Handcap               -0.0162713  0.0319540  -0.509 0.610604    
-Smokes                -0.2342029  0.0229040 -10.225  &lt; 2e-16 ***
-Scholarship           -0.1829617  0.0166560 -10.985  &lt; 2e-16 ***
-Tuberculosis          -0.0179879  0.2259026  -0.080 0.936534    
-Sms_Reminder           0.1068315  0.0106455  10.035  &lt; 2e-16 ***
-AwaitingTime           0.0106467  0.0003273  32.526  &lt; 2e-16 ***
+(Intercept)            0.4843860  0.0177861  27.234  &lt; 2e-16 ***
+Age                    0.0120996  0.0002937  41.203  &lt; 2e-16 ***
+GenderM               -0.0319161  0.0110757  -2.882  0.00396 ** 
+DayOfTheWeekMonday    -0.0729661  0.0165758  -4.402 1.07e-05 ***
+DayOfTheWeekSaturday  -0.3635773  0.0694706  -5.234 1.66e-07 ***
+DayOfTheWeekSunday     0.2047678  1.1595058   0.177  0.85982    
+DayOfTheWeekThursday   0.0397659  0.0164826   2.413  0.01584 *  
+DayOfTheWeekTuesday    0.0727897  0.0164779   4.417 9.99e-06 ***
+DayOfTheWeekWednesday  0.0228333  0.0162783   1.403  0.16071    
+Diabetes              -0.0311425  0.0209296  -1.488  0.13676    
+Alcoolism             -0.3049375  0.0321833  -9.475  &lt; 2e-16 ***
+HiperTension           0.0460312  0.0151069   3.047  0.00231 ** 
+Handcap               -0.0188975  0.0319505  -0.591  0.55421    
+Smokes                -0.2414850  0.0228388 -10.573  &lt; 2e-16 ***
+Scholarship           -0.1735570  0.0166581 -10.419  &lt; 2e-16 ***
+Tuberculosis           0.0540486  0.2300343   0.235  0.81424    
+Sms_Reminder           0.1009123  0.0106527   9.473  &lt; 2e-16 ***
+AwaitingTime           0.0107588  0.0003298  32.623  &lt; 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
     Null deviance: 232752  on 190448  degrees of freedom
-Residual deviance: 228607  on 190431  degrees of freedom
-AIC: 228643
+Residual deviance: 228682  on 190431  degrees of freedom
+AIC: 228718
 
-Number of Fisher Scoring iterations: 7</code></pre>
+Number of Fisher Scoring iterations: 4</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at 0.5.</p>
+<p>We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at a = 0.5.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVzdCRwcmVkaWN0IDwtIHByZWRpY3QobW9kZWwsIG5ld2RhdGE9dGVzdCwgdHlwZT0ncmVzcG9uc2UnKVxudGVzdCRwcmVkaWN0YiA8LSBpZmVsc2UodGVzdCRwcmVkaWN0ID4gYSwxLDApXG5taXNDbGFzaWZpY0Vycm9yIDwtIG1lYW4odGVzdCRwcmVkaWN0YiAhPSB0ZXN0JFN0YXR1cylcbnByaW50KHBhc3RlKCdBY2N1cmFjeScsMS1taXNDbGFzaWZpY0Vycm9yKSlcbmBgYCJ9 -->
@@ -369,49 +410,49 @@ test$predictb &lt;- ifelse(test$predict &gt; a,1,0)
 misClasificError &lt;- mean(test$predictb != test$Status)
 print(paste('Accuracy',1-misClasificError))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWNjdXJhY3kgMC42OTk4NTY2NTQ1Mzc0MzVcIlxuIn0= -->
-<pre><code>[1] &quot;Accuracy 0.699856654537435&quot;</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiQWNjdXJhY3kgMC42OTkzOTEwODgwNzc4MjNcIlxuIn0= -->
+<pre><code>[1] &quot;Accuracy 0.699391088077823&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2ZuTWF0IDwtIGNvbmZ1c2lvbk1hdHJpeCh0ZXN0JHByZWRpY3RiLCB0ZXN0JFN0YXR1cylcbnByaW50KGNmbk1hdClcbmBgYCJ9 -->
 <pre class="r"><code>cfnMat &lt;- confusionMatrix(test$predictb, test$Status)
 print(cfnMat)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uICAgICAwICAgICAxXG4gICAgICAgICAwICAgMTkzICAgMTg2XG4gICAgICAgICAxIDI0MzEyIDU2OTMwXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgQWNjdXJhY3kgOiAwLjY5OTkgICAgICAgICBcbiAgICAgICAgICAgICAgICAgOTUlIENJIDogKDAuNjk2NywgMC43MDMpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNjk5OCAgICAgICAgIFxuICAgIFAtVmFsdWUgW0FjYyA+IE5JUl0gOiAwLjQ4MDQgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMDA2NCAgICAgICAgIFxuIE1jbmVtYXIncyBUZXN0IFAtVmFsdWUgOiA8MmUtMTYgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBTZW5zaXRpdml0eSA6IDAuMDA3ODc2ICAgICAgIFxuICAgICAgICAgICAgU3BlY2lmaWNpdHkgOiAwLjk5Njc0MyAgICAgICBcbiAgICAgICAgIFBvcyBQcmVkIFZhbHVlIDogMC41MDkyMzUgICAgICAgXG4gICAgICAgICBOZWcgUHJlZCBWYWx1ZSA6IDAuNzAwNzQ2ICAgICAgIFxuICAgICAgICAgICAgIFByZXZhbGVuY2UgOiAwLjMwMDIyOSAgICAgICBcbiAgICAgICAgIERldGVjdGlvbiBSYXRlIDogMC4wMDIzNjUgICAgICAgXG4gICBEZXRlY3Rpb24gUHJldmFsZW5jZSA6IDAuMDA0NjQzICAgICAgIFxuICAgICAgQmFsYW5jZWQgQWNjdXJhY3kgOiAwLjUwMjMxMCAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgJ1Bvc2l0aXZlJyBDbGFzcyA6IDAgICAgICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiQ29uZnVzaW9uIE1hdHJpeCBhbmQgU3RhdGlzdGljc1xuXG4gICAgICAgICAgUmVmZXJlbmNlXG5QcmVkaWN0aW9uICAgICAwICAgICAxXG4gICAgICAgICAwICAgMTc0ICAgMjA1XG4gICAgICAgICAxIDI0MzMxIDU2OTExXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgIEFjY3VyYWN5IDogMC42OTk0ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICA5NSUgQ0kgOiAoMC42OTYyLCAwLjcwMjUpXG4gICAgTm8gSW5mb3JtYXRpb24gUmF0ZSA6IDAuNjk5OCAgICAgICAgICBcbiAgICBQLVZhbHVlIFtBY2MgPiBOSVJdIDogMC41OTUyICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICAgICAgICBLYXBwYSA6IDAuMDA0OSAgICAgICAgICBcbiBNY25lbWFyJ3MgVGVzdCBQLVZhbHVlIDogPDJlLTE2ICAgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgICAgICBTZW5zaXRpdml0eSA6IDAuMDA3MTAxICAgICAgICBcbiAgICAgICAgICAgIFNwZWNpZmljaXR5IDogMC45OTY0MTEgICAgICAgIFxuICAgICAgICAgUG9zIFByZWQgVmFsdWUgOiAwLjQ1OTEwMyAgICAgICAgXG4gICAgICAgICBOZWcgUHJlZCBWYWx1ZSA6IDAuNzAwNTEyICAgICAgICBcbiAgICAgICAgICAgICBQcmV2YWxlbmNlIDogMC4zMDAyMjkgICAgICAgIFxuICAgICAgICAgRGV0ZWN0aW9uIFJhdGUgOiAwLjAwMjEzMiAgICAgICAgXG4gICBEZXRlY3Rpb24gUHJldmFsZW5jZSA6IDAuMDA0NjQzICAgICAgICBcbiAgICAgIEJhbGFuY2VkIEFjY3VyYWN5IDogMC41MDE3NTYgICAgICAgIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXG4gICAgICAgJ1Bvc2l0aXZlJyBDbGFzcyA6IDAgICAgICAgICAgICAgICBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFxuIn0= -->
 <pre><code>Confusion Matrix and Statistics
 
           Reference
 Prediction     0     1
-         0   193   186
-         1 24312 56930
-                                         
-               Accuracy : 0.6999         
-                 95% CI : (0.6967, 0.703)
-    No Information Rate : 0.6998         
-    P-Value [Acc &gt; NIR] : 0.4804         
-                                         
-                  Kappa : 0.0064         
- Mcnemar's Test P-Value : &lt;2e-16         
-                                         
-            Sensitivity : 0.007876       
-            Specificity : 0.996743       
-         Pos Pred Value : 0.509235       
-         Neg Pred Value : 0.700746       
-             Prevalence : 0.300229       
-         Detection Rate : 0.002365       
-   Detection Prevalence : 0.004643       
-      Balanced Accuracy : 0.502310       
-                                         
-       'Positive' Class : 0              
-                                         </code></pre>
+         0   174   205
+         1 24331 56911
+                                          
+               Accuracy : 0.6994          
+                 95% CI : (0.6962, 0.7025)
+    No Information Rate : 0.6998          
+    P-Value [Acc &gt; NIR] : 0.5952          
+                                          
+                  Kappa : 0.0049          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.007101        
+            Specificity : 0.996411        
+         Pos Pred Value : 0.459103        
+         Neg Pred Value : 0.700512        
+             Prevalence : 0.300229        
+         Detection Rate : 0.002132        
+   Detection Prevalence : 0.004643        
+      Balanced Accuracy : 0.501756        
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 49% right all the times and when it predicts 1 (= Show-up) it is 70% correct.</p>
+<p>Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is 54% right all the times and when it predicts 1 (= Show-up) it is 70% correct.</p>
 <p>We also see that the likelihood that the quoted accuracy actually is higher than the accuracy of a predition without any information is just around 50% (ergo: just as likely to be higher as lower). The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a <strong>1</strong> regardless of any input information it would have an accuracy of 70%, which is almost equal to the accuracy of the logistic model.</p>
 <p>Apparently the process underlying the meeting of doctor’s appointments is not linearly logistic. We should try a different approach like nearest neighbours, decision trees, support vector machines or neural networks.</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiTG9naXN0aWMgcmVncmVzc2lvbiIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB0dXRvcmlhbCBJIHdpbGwgZXhwbGFpbiBob3cgeW91IGNhbiBidWlsZCBhIGxvZ2lzdGljIHJlZ3Jlc3Npb24gbW9kZWwgYW5kIHRlc3QgaXQuIEZpcnN0IHdlJ2xsIGxvYWQgYSBkYXRhIHNldC4gSXQgY29tZXMgZnJvbSBbS2FnZ2xlXShodHRwczovL3d3dy5rYWdnbGUuY29tL2pvbmlhcnJvYmEvbm9zaG93YXBwb2ludG1lbnRzKS4gVGhlIGRhdGEgc2V0IGlzIGNvbXByZXNzZWQgYW5kIHdlIGFyZSBnb2luZyB0byByZWFkIGRpcmVjdGx5IGZyb20gdGhlIHppcCBmaWxlIChvdGhlcndpc2UgaXQgd291bGQgdGFrZSB0b28gbG9uZzogNCB2ZXJzdXMgMjRNQikuCgpgYGB7cn0KdGVtcCA8LSB0ZW1wZmlsZSgpCmRvd25sb2FkLmZpbGUoImh0dHBzOi8vZ2l0aHViLmNvbS9taW5vcnNtYXJ0L0ZFQjIwMTcvYmxvYi9tYXN0ZXIvV2l0ZWsvZG9jdG9yL05vLXNob3ctSXNzdWUtQ29tbWEtMzAway5jc3YuemlwP3Jhdz10cnVlIix0ZW1wKQpkYXRhIDwtIHJlYWQuY3N2KHVueih0ZW1wLCAiTm8tc2hvdy1Jc3N1ZS1Db21tYS0zMDBrLmNzdiIpKQp1bmxpbmsodGVtcCkKYGBgCgpOb3cgd2UgaGF2ZSB0aGUgZGF0YSBzZXQgaW4gYSBkYXRhIGZyYW1lIHdlIGNhbiBzdGFydCBwcmVwYXJpbmcgaXQgZm9yIHRoZSBtb2RlbC4gV2UnbGwgZmlyc3QgbG9hZCBzb21lIHVzZWZ1bGwgcGFja2FnZXMgYW5kIHRoZW4gbG9vayBhdCB0aGUgc3RydWN0dXJlIGFuZCBxdWFsaXR5IG9mIHRoZSBkYXRhLgoKYGBge3IsIGVjaG89VFJVRX0KbGlicmFyeShkcGx5cikKbGlicmFyeShjYVRvb2xzKQpsaWJyYXJ5KGJpZ2xtKQpsaWJyYXJ5KGNhcmV0KQoKc3RyKGRhdGEpCnN1bW1hcnkoZGF0YSkKYGBgCgpUaGUgZGF0YSBzZXQgY29tcHJpc2VzIG9mIDMwMCwwMDAgcmVjb3JkZWQgZG9jdG9yJ3MgYXBwb2ludG1lbnRzIHdpdGggMTUgdmFyaWFibGVzLiBXZSBoYXZlIGEgbG90IG9mIGNhdGVnb3JpY2FsIHZhcmlhYmxlcyBvZiB3aGljaCBtYW55IGFyZSBib29sZWFuICgwIG9yIDEpLiBXZSB3YW50IHRvIHByZWRpY3Qgd2hldGhlciBhIHBhdGllbnQgd2lsbCBzaG93IHVwIGZvciBhIGRvY3RvcidzIGFwcG9pbnRtZW50ICh2YXJpYWJsZSBgU3RhdHVzYCkuCgpDbGVhcmx5IHRoZSByZWdpc3RyYXRpb24gYW5kIGFwcG9pbnRtZW50IGRhdGUgd2lsbCBub3QgaGF2ZSBtdWNoIHByZWRpY3RpdmUgcG93ZXIgYXMgdGhleSBhcmUgcmF0aGVyIHVuaXF1ZS4gV2Ugd2lsbCBkZWxldGUgdGhlc2UgdmFyaWFibGVzIGZyb20gdGhlIHNldC4KCldlIGFsc28gc2VlIHNvbWUgcGVjdWxpYXIgYWdlcyBsaWtlIDExMyBhbmQgLTIgeWVhcnMuIFdlJ2xsIGZpbHRlciBvdXQgYWxsIGFnZXMgYmVsb3cgNSBhbmQgYWJvdmUgOTUuCgpGaW5hbGx5IHdlIHdpbGwgY2hhbmdlIHRoZSBgU3RhdHVzYCB2YXJpYWJsZSBpbnRvIGEgKiowKiovKioxKiogYm9vbGVhbi4gVGhpcyB3aWxsIGhlbHAgdXMgaW50ZXJwcmV0IHRoZSBwcmVkaWN0ZWQgdmFsdWUgYXQgdGhlIGVuZC4KCmBgYHtyfQpkYXRhIDwtIGRhdGFbLC1jKDMsNCldCmRhdGEgPC0gZmlsdGVyKGRhdGEsIEFnZSA+IDUsIEFnZSA8IDk1KQpkYXRhJFN0YXR1cyA8LSAoZGF0YSRTdGF0dXMgPT0gIlNob3ctVXAiKSoxCnN0cihkYXRhKQpzdW1tYXJ5KGRhdGEpCmBgYAoKVGhlIGNsZWFuaW5nIGRlbGV0ZWQgYXJvdW5kIDI4LDAwMCByZWNvcmRzLiBXZSB3aWxsIG5vdyBzcGxpdCB0aGUgZGF0YSBmcmFtZSBpbnRvIHR3byBzZXRzLiBPbmUgZm9yIHRyYWluaW5nIHRoZSBtb2RlbCBhbmQgb25lIGZvciB0ZXN0aW5nIGl0LiBXaGVuIHdlIHNwbGl0IHdlIG5lZWQgdG8gdGFrZSBjYXJlIHRoYXQgZWFjaCBzZXQgaGFzIGVub3VnaCB2YXJpYWJpbGl0eSBpbiB0aGUgcHJlZGljdGVkIHZhcmlhYmxlIChgU3RhdHVzYCkuIE90aGVyd2lzZSBlaXRoZXIgaXQgY2FuIG5vdCBsZWFybiBwcm9wZXJseSBvciBpdCBjYW4gbm90IGRvIGEgbWVhbmluZ2Z1bCB0ZXN0IChpbWFnaW5lIGFsbCB2YWx1ZXMgb2YgYFN0YXR1c2AgaW4gb25lIG9mIHRoZSBzdWJzZXRzIHdlcmUgKioxKiogb3IgKiowKiopLiBUaGlzIGlzIHdoZXJlIHRoZSBmdW5jdGlvbiBgc2FtcGxlLnNwbGl0KClgIGZyb20gdGhlIGBjYXJldGAgcGFja2FnZSBjb21lcyBpbi4KCmBgYHtyfQpkYXRhJHNwbCA8LSBzYW1wbGUuc3BsaXQoZGF0YSRTdGF0dXMsIFNwbGl0UmF0aW89MC43MCkKdHJhaW4gPC0gc3Vic2V0KGRhdGEsIGRhdGEkc3BsPT1UUlVFKQp0ZXN0IDwtIHN1YnNldChkYXRhLCBkYXRhJHNwbD09RkFMU0UpCmBgYAoKTm93IHdlIGNhbiB0cmFpbiBhIG1vZGVsIHVzaW5nIGEgbG9naXN0aWMgcmVncmVzc2lvbiBhbmQgaGF2ZSBhIGxvb2sgYXQgdGhlIHBhcmFtZXRlcnMuCgpgYGB7cn0KbW9kZWwgPC0gZ2xtIChTdGF0dXMgfiAuIC1zcGwsIGRhdGEgPSB0cmFpbiwgZmFtaWx5ID0gYmlub21pYWwpCnN1bW1hcnkobW9kZWwpCmBgYApXZSBjYW4gdGVzdCBob3cgd2VsbCB0aGUgbW9kZWwgcGVyZm9ybXMgYnkgY29tcGFyaW5nIGl0cyBwcmVkaWN0aW9ucyB3aXRoIGFjdHVhbCB2YWx1ZXMuIFRoZSBtb2RlbCByZXR1cm5zIGEgbGlrZWxpaG9vZCB2YWx1ZS4gV2Ugc2V0IHRoZSBjdXRvZmYgcmF0ZSBhdCBgciBhIDwtIDAuNTsgYWAuCgpgYGB7cn0KdGVzdCRwcmVkaWN0IDwtIHByZWRpY3QobW9kZWwsIG5ld2RhdGE9dGVzdCwgdHlwZT0ncmVzcG9uc2UnKQp0ZXN0JHByZWRpY3RiIDwtIGlmZWxzZSh0ZXN0JHByZWRpY3QgPiBhLDEsMCkKbWlzQ2xhc2lmaWNFcnJvciA8LSBtZWFuKHRlc3QkcHJlZGljdGIgIT0gdGVzdCRTdGF0dXMpCnByaW50KHBhc3RlKCdBY2N1cmFjeScsMS1taXNDbGFzaWZpY0Vycm9yKSkKCmNmbk1hdCA8LSBjb25mdXNpb25NYXRyaXgodGVzdCRwcmVkaWN0YiwgdGVzdCRTdGF0dXMpCnByaW50KGNmbk1hdCkKYGBgClVuZm9ydHVuYXRlbHkgdGhlIG1vZGVsIGhhcyBoYXJkbHkgYW55IHByZWRpY3RpdmUgcG93ZXIuIFdlIGNhbiBzZWUgZnJvbSB0aGUgY29uZnVzaW9uIG1hdHJpeCB0aGF0IHdoZW4gaXQgcHJlZGljdHMgMCBpdCBpcyBgciBwYXN0ZTAocm91bmQoMTAwKmNmbk1hdCR0YWJsZVsxLDJdIC8gKGNmbk1hdCR0YWJsZVsxLDFdICsgY2ZuTWF0JHRhYmxlWzEsMl0pKSwgIiUiKWAgcmlnaHQgYWxsIHRoZSB0aW1lcyBhbmQgd2hlbiBpdCBwcmVkaWN0cyAxICg9IFNob3ctdXApIGl0IGlzIGByIHBhc3RlMChyb3VuZCgxMDAqY2ZuTWF0JHRhYmxlWzIsMl0gLyAoY2ZuTWF0JHRhYmxlWzIsMV0gKyBjZm5NYXQkdGFibGVbMiwyXSkpLCAiJSIpYCBjb3JyZWN0LgoKV2UgYWxzbyBzZWUgdGhhdCB0aGUgbGlrZWxpaG9vZCB0aGF0IHRoZSBxdW90ZWQgYWNjdXJhY3kgYWN0dWFsbHkgaXMgaGlnaGVyIHRoYW4gdGhlIGFjY3VyYWN5IG9mIGEgcHJlZGl0aW9uIHdpdGhvdXQgYW55IGluZm9ybWF0aW9uIGlzIGp1c3QgYXJvdW5kIDUwJSAoZXJnbzoganVzdCBhcyBsaWtlbHkgdG8gYmUgaGlnaGVyIGFzIGxvd2VyKS4gVGhlIE5vIEluZm9ybWF0aW9uIFJhdGUgaXMgZXF1YWwgdG8gdGhlIG1lYW4gb2YgdGhlIHN0YXR1cyB2YXJpYWJsZS4gU28sIGlmIHdlIHdvdWxkIGhhdmUgYnVpbGQgYSBtb2RlbCB0aGF0IHdvdWxkIGdlbmVyYXRlIGEgKioxKiogcmVnYXJkbGVzcyBvZiBhbnkgaW5wdXQgaW5mb3JtYXRpb24gaXQgd291bGQgaGF2ZSBhbiBhY2N1cmFjeSBvZiBgciBwYXN0ZTAocm91bmQoMTAwKm1lYW4oZGF0YSRTdGF0dXMpKSwgIiUiKWAsIHdoaWNoIGlzIGFsbW9zdCBlcXVhbCB0byB0aGUgYWNjdXJhY3kgb2YgdGhlIGxvZ2lzdGljIG1vZGVsLgoKQXBwYXJlbnRseSB0aGUgcHJvY2VzcyB1bmRlcmx5aW5nIHRoZSBtZWV0aW5nIG9mIGRvY3RvcidzIGFwcG9pbnRtZW50cyBpcyBub3QgbGluZWFybHkgbG9naXN0aWMuIFdlIHNob3VsZCB0cnkgYSBkaWZmZXJlbnQgYXBwcm9hY2ggbGlrZSBuZWFyZXN0IG5laWdoYm91cnMsIGRlY2lzaW9uIHRyZWVzLCBzdXBwb3J0IHZlY3RvciBtYWNoaW5lcyBvciBuZXVyYWwgbmV0d29ya3MuCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTG9naXN0aWMgcmVncmVzc2lvbiIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKSW4gdGhpcyB0dXRvcmlhbCBJIHdpbGwgZXhwbGFpbiBob3cgeW91IGNhbiBidWlsZCBhIGxvZ2lzdGljIHJlZ3Jlc3Npb24gbW9kZWwgYW5kIHRlc3QgaXQuIEZpcnN0IHdlJ2xsIGxvYWQgYSBkYXRhIHNldC4gSXQgY29tZXMgZnJvbSBbS2FnZ2xlXShodHRwczovL3d3dy5rYWdnbGUuY29tL2pvbmlhcnJvYmEvbm9zaG93YXBwb2ludG1lbnRzKS4gVGhlIGRhdGEgc2V0IGlzIGNvbXByZXNzZWQgYW5kIHdlIGFyZSBnb2luZyB0byByZWFkIGRpcmVjdGx5IGZyb20gdGhlIHppcCBmaWxlIChvdGhlcndpc2UgaXQgd291bGQgdGFrZSB0b28gbG9uZzogNCB2ZXJzdXMgMjRNQikuCgpgYGB7cn0KdGVtcCA8LSB0ZW1wZmlsZSgpCmRvd25sb2FkLmZpbGUoImh0dHBzOi8vZ2l0aHViLmNvbS9taW5vcnNtYXJ0L0ZFQjIwMTcvYmxvYi9tYXN0ZXIvV2l0ZWsvZG9jdG9yL05vLXNob3ctSXNzdWUtQ29tbWEtMzAway5jc3YuemlwP3Jhdz10cnVlIix0ZW1wKQpkYXRhIDwtIHJlYWQuY3N2KHVueih0ZW1wLCAiTm8tc2hvdy1Jc3N1ZS1Db21tYS0zMDBrLmNzdiIpKQp1bmxpbmsodGVtcCkKYGBgCgpOb3cgd2UgaGF2ZSB0aGUgZGF0YSBzZXQgaW4gYSBkYXRhIGZyYW1lIHdlIGNhbiBzdGFydCBwcmVwYXJpbmcgaXQgZm9yIHRoZSBtb2RlbC4gV2UnbGwgZmlyc3QgbG9hZCBzb21lIHVzZWZ1bGwgcGFja2FnZXMgYW5kIHRoZW4gbG9vayBhdCB0aGUgc3RydWN0dXJlIGFuZCBxdWFsaXR5IG9mIHRoZSBkYXRhLgoKYGBge3IsIGVjaG89VFJVRX0KbGlicmFyeShkcGx5cikKbGlicmFyeShjYVRvb2xzKQpsaWJyYXJ5KGJpZ2xtKQpsaWJyYXJ5KGNhcmV0KQoKc3RyKGRhdGEpCnN1bW1hcnkoZGF0YSkKYGBgCgpUaGUgZGF0YSBzZXQgY29tcHJpc2VzIG9mIDMwMCwwMDAgcmVjb3JkZWQgZG9jdG9yJ3MgYXBwb2ludG1lbnRzIHdpdGggMTUgdmFyaWFibGVzLiBXZSBoYXZlIGEgbG90IG9mIGNhdGVnb3JpY2FsIHZhcmlhYmxlcyBvZiB3aGljaCBtYW55IGFyZSBib29sZWFuICgwIG9yIDEpLiBXZSB3YW50IHRvIHByZWRpY3Qgd2hldGhlciBhIHBhdGllbnQgd2lsbCBzaG93IHVwIGZvciBhIGRvY3RvcidzIGFwcG9pbnRtZW50ICh2YXJpYWJsZSBgU3RhdHVzYCkuCgpDbGVhcmx5IHRoZSByZWdpc3RyYXRpb24gYW5kIGFwcG9pbnRtZW50IGRhdGUgd2lsbCBub3QgaGF2ZSBtdWNoIHByZWRpY3RpdmUgcG93ZXIgYXMgdGhleSBhcmUgcmF0aGVyIHVuaXF1ZS4gV2Ugd2lsbCBkZWxldGUgdGhlc2UgdmFyaWFibGVzIGZyb20gdGhlIHNldC4KCldlIGFsc28gc2VlIHNvbWUgcGVjdWxpYXIgYWdlcyBsaWtlIDExMyBhbmQgLTIgeWVhcnMuIFdlJ2xsIGZpbHRlciBvdXQgYWxsIGFnZXMgYmVsb3cgNSBhbmQgYWJvdmUgOTUuCgpGaW5hbGx5IHdlIHdpbGwgY2hhbmdlIHRoZSBgU3RhdHVzYCB2YXJpYWJsZSBpbnRvIGEgKiowKiovKioxKiogYm9vbGVhbi4gVGhpcyB3aWxsIGhlbHAgdXMgaW50ZXJwcmV0IHRoZSBwcmVkaWN0ZWQgdmFsdWUgYXQgdGhlIGVuZC4KCmBgYHtyfQpkYXRhIDwtIGRhdGFbLC1jKDMsNCldCmRhdGEgPC0gZmlsdGVyKGRhdGEsIEFnZSA+IDUsIEFnZSA8IDk1KQpkYXRhJFN0YXR1cyA8LSAoZGF0YSRTdGF0dXMgPT0gIlNob3ctVXAiKSoxCnN0cihkYXRhKQpzdW1tYXJ5KGRhdGEpCmBgYAoKVGhlIGNsZWFuaW5nIGRlbGV0ZWQgYXJvdW5kIDI4LDAwMCByZWNvcmRzLiBXZSB3aWxsIG5vdyBzcGxpdCB0aGUgZGF0YSBmcmFtZSBpbnRvIHR3byBzZXRzLiBPbmUgZm9yIHRyYWluaW5nIHRoZSBtb2RlbCBhbmQgb25lIGZvciB0ZXN0aW5nIGl0LiBXaGVuIHdlIHNwbGl0IHdlIG5lZWQgdG8gdGFrZSBjYXJlIHRoYXQgZWFjaCBzZXQgaGFzIGVub3VnaCB2YXJpYWJpbGl0eSBpbiB0aGUgcHJlZGljdGVkIHZhcmlhYmxlIChgU3RhdHVzYCkuIE90aGVyd2lzZSBlaXRoZXIgaXQgY2FuIG5vdCBsZWFybiBwcm9wZXJseSBvciBpdCBjYW4gbm90IGRvIGEgbWVhbmluZ2Z1bCB0ZXN0IChpbWFnaW5lIGFsbCB2YWx1ZXMgb2YgYFN0YXR1c2AgaW4gb25lIG9mIHRoZSBzdWJzZXRzIHdlcmUgKioxKiogb3IgKiowKiopLiBUaGlzIGlzIHdoZXJlIHRoZSBmdW5jdGlvbiBgc2FtcGxlLnNwbGl0KClgIGZyb20gdGhlIGBjYXJldGAgcGFja2FnZSBjb21lcyBpbi4KCmBgYHtyfQpkYXRhJHNwbCA8LSBzYW1wbGUuc3BsaXQoZGF0YSRTdGF0dXMsIFNwbGl0UmF0aW89MC43MCkKdHJhaW4gPC0gc3Vic2V0KGRhdGEsIGRhdGEkc3BsPT1UUlVFKQp0ZXN0IDwtIHN1YnNldChkYXRhLCBkYXRhJHNwbD09RkFMU0UpCmBgYAoKTm93IHdlIGNhbiB0cmFpbiBhIG1vZGVsIHVzaW5nIGEgbG9naXN0aWMgcmVncmVzc2lvbiBhbmQgaGF2ZSBhIGxvb2sgYXQgdGhlIHBhcmFtZXRlcnMuCgpgYGB7cn0KbW9kZWwgPC0gZ2xtIChTdGF0dXMgfiAuIC1zcGwsIGRhdGEgPSB0cmFpbiwgZmFtaWx5ID0gYmlub21pYWwpCnN1bW1hcnkobW9kZWwpCmBgYApXZSBjYW4gdGVzdCBob3cgd2VsbCB0aGUgbW9kZWwgcGVyZm9ybXMgYnkgY29tcGFyaW5nIGl0cyBwcmVkaWN0aW9ucyB3aXRoIGFjdHVhbCB2YWx1ZXMuIFRoZSBtb2RlbCByZXR1cm5zIGEgbGlrZWxpaG9vZCB2YWx1ZS4gV2Ugc2V0IHRoZSBjdXRvZmYgcmF0ZSBhdCBhID0gYHIgYSA8LSAwLjU7IGFgLgoKYGBge3J9CnRlc3QkcHJlZGljdCA8LSBwcmVkaWN0KG1vZGVsLCBuZXdkYXRhPXRlc3QsIHR5cGU9J3Jlc3BvbnNlJykKdGVzdCRwcmVkaWN0YiA8LSBpZmVsc2UodGVzdCRwcmVkaWN0ID4gYSwxLDApCm1pc0NsYXNpZmljRXJyb3IgPC0gbWVhbih0ZXN0JHByZWRpY3RiICE9IHRlc3QkU3RhdHVzKQpwcmludChwYXN0ZSgnQWNjdXJhY3knLDEtbWlzQ2xhc2lmaWNFcnJvcikpCgpjZm5NYXQgPC0gY29uZnVzaW9uTWF0cml4KHRlc3QkcHJlZGljdGIsIHRlc3QkU3RhdHVzKQpwcmludChjZm5NYXQpCmBgYApVbmZvcnR1bmF0ZWx5IHRoZSBtb2RlbCBoYXMgaGFyZGx5IGFueSBwcmVkaWN0aXZlIHBvd2VyLiBXZSBjYW4gc2VlIGZyb20gdGhlIGNvbmZ1c2lvbiBtYXRyaXggdGhhdCB3aGVuIGl0IHByZWRpY3RzIDAgaXQgaXMgYHIgcGFzdGUwKHJvdW5kKDEwMCpjZm5NYXQkdGFibGVbMSwyXSAvIChjZm5NYXQkdGFibGVbMSwxXSArIGNmbk1hdCR0YWJsZVsxLDJdKSksICIlIilgIHJpZ2h0IGFsbCB0aGUgdGltZXMgYW5kIHdoZW4gaXQgcHJlZGljdHMgMSAoPSBTaG93LXVwKSBpdCBpcyBgciBwYXN0ZTAocm91bmQoMTAwKmNmbk1hdCR0YWJsZVsyLDJdIC8gKGNmbk1hdCR0YWJsZVsyLDFdICsgY2ZuTWF0JHRhYmxlWzIsMl0pKSwgIiUiKWAgY29ycmVjdC4KCldlIGFsc28gc2VlIHRoYXQgdGhlIGxpa2VsaWhvb2QgdGhhdCB0aGUgcXVvdGVkIGFjY3VyYWN5IGFjdHVhbGx5IGlzIGhpZ2hlciB0aGFuIHRoZSBhY2N1cmFjeSBvZiBhIHByZWRpdGlvbiB3aXRob3V0IGFueSBpbmZvcm1hdGlvbiBpcyBqdXN0IGFyb3VuZCA1MCUgKGVyZ286IGp1c3QgYXMgbGlrZWx5IHRvIGJlIGhpZ2hlciBhcyBsb3dlcikuIFRoZSBObyBJbmZvcm1hdGlvbiBSYXRlIGlzIGVxdWFsIHRvIHRoZSBtZWFuIG9mIHRoZSBzdGF0dXMgdmFyaWFibGUuIFNvLCBpZiB3ZSB3b3VsZCBoYXZlIGJ1aWxkIGEgbW9kZWwgdGhhdCB3b3VsZCBnZW5lcmF0ZSBhICoqMSoqIHJlZ2FyZGxlc3Mgb2YgYW55IGlucHV0IGluZm9ybWF0aW9uIGl0IHdvdWxkIGhhdmUgYW4gYWNjdXJhY3kgb2YgYHIgcGFzdGUwKHJvdW5kKDEwMCptZWFuKGRhdGEkU3RhdHVzKSksICIlIilgLCB3aGljaCBpcyBhbG1vc3QgZXF1YWwgdG8gdGhlIGFjY3VyYWN5IG9mIHRoZSBsb2dpc3RpYyBtb2RlbC4KCkFwcGFyZW50bHkgdGhlIHByb2Nlc3MgdW5kZXJseWluZyB0aGUgbWVldGluZyBvZiBkb2N0b3IncyBhcHBvaW50bWVudHMgaXMgbm90IGxpbmVhcmx5IGxvZ2lzdGljLiBXZSBzaG91bGQgdHJ5IGEgZGlmZmVyZW50IGFwcHJvYWNoIGxpa2UgbmVhcmVzdCBuZWlnaGJvdXJzLCBkZWNpc2lvbiB0cmVlcywgc3VwcG9ydCB2ZWN0b3IgbWFjaGluZXMgb3IgbmV1cmFsIG5ldHdvcmtzLgo=</div>
 
 
 

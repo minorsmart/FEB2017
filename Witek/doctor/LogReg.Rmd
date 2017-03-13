@@ -54,7 +54,7 @@ Now we can train a model using a logistic regression and have a look at the para
 model <- glm (Status ~ . -spl, data = train, family = binomial)
 summary(model)
 ```
-We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at `r a <- 0.5; a`.
+We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at a = `r a <- 0.5; a`.
 
 ```{r}
 test$predict <- predict(model, newdata=test, type='response')
