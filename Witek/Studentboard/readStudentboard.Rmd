@@ -98,12 +98,8 @@ Now we can make a simple bar plot.
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 meanPlot <- ggplot(meltMeans) + 
   geom_col(aes(x = Timestamp, y = value, col = variable, fill = variable)) +
-<<<<<<< HEAD
   theme(axis.text.x = element_text(angle=90)) 
-  
-=======
   theme(axis.text.x = element_text(angle=90))
->>>>>>> 29af1cbd180a159689cd2d38393e19913e3b132b
 meanPlot
 ```
 

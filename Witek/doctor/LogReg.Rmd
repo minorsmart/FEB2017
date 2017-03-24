@@ -16,6 +16,8 @@ Now we have the data set in a data frame we can start preparing it for the model
 
 ```{r, echo=TRUE}
 library(dplyr)
+library(tidyr)
+library(magrittr)
 library(caTools)
 library(biglm)
 library(caret)
@@ -24,20 +26,38 @@ str(data)
 summary(data)
 ```
 
-The data set comprises of 300,000 recorded doctor's appointments with 15 variables. We have a lot of categorical variables of which many are boolean (0 or 1). We want to predict whether a patient will show up for a doctor's appointment (variable `Status`).
+The data set comprises 300,000 recorded doctor's appointments with 15 variables. We have a lot of categorical variables of which many are boolean (0 or 1). We want to predict whether a patient will show up for a doctor's appointment (variable `Status`).
 
-Clearly the registration and appointment date will not have much predictive power as they are rather unique. We will delete these variables from the set.
+We see some peculiar ages like 113 and -2 years. We'll filter out all ages below 5 and above 95.
 
-We also see some peculiar ages like 113 and -2 years. We'll filter out all ages below 5 and above 95.
+Next we will change the `Status` variable into a **0**/**1** boolean. This will help us interpret the predicted value at the end when doing a logistic regression.
 
-Finally we will change the `Status` variable into a **0**/**1** boolean. This will help us interpret the predicted value at the end.
+Finally we will change all boolean variables into factors and do a visual inspection of the data.
 
 ```{r}
-data <- data[,-c(3,4)]
+data <- data[,-3]
+data <- separate(data, ApointmentData, c("Date", "Time"), sep = "T")
+
+data <- separate(data, Date, c("Year", "Month", "Day"), sep = "-")
+data$Year <- as.factor(data$Year)
+data <- data[,-6]
 data <- filter(data, Age > 5, Age < 95)
 data$Status <- (data$Status == "Show-Up")*1
+cols <- names(data[4:15])
+data %<>% mutate_each_(funs(factor(.)),cols)
 str(data)
 summary(data)
+barplot(sum(is.na(data)*1)/dim(data)[1])
+
+selCols <- c("Age", "Gender", "Year", "Month", "DayOfTheWeek", "Diabetes", "Alcoolism", "HiperTension", "Handcap", "Smokes", "Scholarship", "Tuberculosis", "Sms_Reminder", "AwaitingTime")
+
+for(i in selCols) {
+  
+  counts <- table(data$Status, data[, i])
+  barplot(counts, col=c("red","darkblue"), xlab = i, legend = rownames(counts))
+  
+}
+            
 ```
 
 The cleaning deleted around 28,000 records. We will now split the data frame into two sets. One for training the model and one for testing it. When we split we need to take care that each set has enough variability in the predicted variable (`Status`). Otherwise either it can not learn properly or it can not do a meaningful test (imagine all values of `Status` in one of the subsets were **1** or **0**). This is where the function `sample.split()` from the `caret` package comes in.
@@ -51,13 +71,14 @@ test <- subset(data, data$spl==FALSE)
 Now we can train a model using a logistic regression and have a look at the parameters.
 
 ```{r}
-model <- glm (Status ~ . -spl, data = train, family = binomial)
-summary(model)
+reg.model <- glm (Status ~ . -spl, data = train, family = binomial)
+summary(reg.model)
 ```
-We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at a = `r a <- 0.5; a`.
+We can test how well the model performs by comparing its predictions with actual values. The model returns a likelihood value. We set the cutoff rate at a = `r a`.
 
 ```{r}
-test$predict <- predict(model, newdata=test, type='response')
+a <- 0.5
+test$predict <- predict(reg.model, newdata=test, type='response')
 test$predictb <- ifelse(test$predict > a,1,0)
 misClasificError <- mean(test$predictb != test$Status)
 print(paste('Accuracy',1-misClasificError))
@@ -67,6 +88,60 @@ print(cfnMat)
 ```
 Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is `r paste0(round(100*cfnMat$table[1,2] / (cfnMat$table[1,1] + cfnMat$table[1,2])), "%")` right all the times and when it predicts 1 (= Show-up) it is `r paste0(round(100*cfnMat$table[2,2] / (cfnMat$table[2,1] + cfnMat$table[2,2])), "%")` correct.
 
-We also see that the likelihood that the quoted accuracy actually is higher than the accuracy of a predition without any information is just around 50% (ergo: just as likely to be higher as lower). The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*mean(data$Status)), "%")`, which is almost equal to the accuracy of the logistic model.
+The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*mean(data$Status)), "%")`, which is almost equal to the accuracy of the logistic model.
 
-Apparently the process underlying the meeting of doctor's appointments is not linearly logistic. We should try a different approach like nearest neighbours, decision trees, support vector machines or neural networks.
+Apparently the process underlying the meeting of doctor's appointments is not linearly logistic (at least not by this model). We should try a different approach like decision trees or neural networks.
+
+First we'll try a simple tree model to see whether that improves accuracy. We'll use the `rpart` package for this. After that we will try and see how an basic neural network performs on the data.
+
+```{r}
+library(rpart)
+tree.model <- rpart(Status ~ . -spl, data = train, method = 'class', minsplit = 2, minbucket = 1)
+summary(tree.model)
+
+bestcp <- tree.model$cptable[which.min(tree.model$cptable[,"xerror"]),"CP"]
+
+tree.pruned <- prune(tree.model, cp = bestcp)
+
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
+fancyRpartPlot(tree.model)
+
+test$predict <- NULL
+test$predictb <- NULL
+test$Status <- as.factor(test$Status)
+test$predict <- predict(tree.model, newdata=test, type='class')
+
+misClasificError <- mean(test$predict != test$Status)
+print(paste('Accuracy',1-misClasificError))
+
+cfnMat <- confusionMatrix(test$predict, test$Status)
+print(cfnMat)
+```
+
+
+```{r}
+library(nnet)
+train$Status <- as.factor(train$Status)
+nn.model <- nnet(Status ~ . -spl, data=train, size=10, maxit=600)
+
+library(devtools)
+source_url('https://gist.githubusercontent.com/fawda123/7471137/raw/466c1474d0a505ff044412703516c34f1a4684a5/nnet_plot_update.r')
+ 
+#plot the model
+plot.nnet(nn.model)
+```
+
+```{r}
+test$predict <- NULL
+test$predictb <- NULL
+test$Status <- as.factor(test$Status)
+test$predict <- predict(nn.model, newdata=test, type='class')
+misClasificError <- mean(test$predict != test$Status)
+print(paste('Accuracy',1-misClasificError))
+
+cfnMat <- confusionMatrix(test$predict, test$Status)
+print(cfnMat)
+```
+
