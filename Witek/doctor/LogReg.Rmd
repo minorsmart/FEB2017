@@ -88,7 +88,7 @@ print(cfnMat)
 ```
 Unfortunately the model has hardly any predictive power. We can see from the confusion matrix that when it predicts 0 it is `r paste0(round(100*cfnMat$table[1,2] / (cfnMat$table[1,1] + cfnMat$table[1,2])), "%")` right all the times and when it predicts 1 (= Show-up) it is `r paste0(round(100*cfnMat$table[2,2] / (cfnMat$table[2,1] + cfnMat$table[2,2])), "%")` correct.
 
-The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*mean(data$Status)), "%")`, which is almost equal to the accuracy of the logistic model.
+The No Information Rate is equal to the mean of the status variable. So, if we would have build a model that would generate a **1** regardless of any input information it would have an accuracy of `r paste0(round(100*(mean(as.numeric(data$Status))-1)), "%")`, which is almost equal to the accuracy of the logistic model.
 
 Apparently the process underlying the meeting of doctor's appointments is not linearly logistic (at least not by this model). We should try a different approach like decision trees or neural networks.
 
