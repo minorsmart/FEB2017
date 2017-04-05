@@ -7,14 +7,16 @@ always_allow_html: default
 ---
 
 
-Load necessary packages. For [pattern.nlp](http://www.bnosac.be/index.php/blog/54-sentiment-analysis-and-parts-of-speech-tagging-in-dutch-french-english-german-spanish-italian) you need Python (version below 3.0) installed on your system with the `pattern` library. 
+This analysis is inspired by this [article](http://www.bnosac.be/index.php/blog/54-sentiment-analysis-and-parts-of-speech-tagging-in-dutch-french-english-german-spanish-italian).
+
+First load the necessary packages. For [pattern.nlp](https://github.com/bnosac/pattern.nlp) you need Python (version below 3.0) installed on your system with the `pattern` library. In my case I got an 'No module named pattern.db' error. I solved this by manually copying the downloaded `pattern` folder into the Python `site-packages' folder.
 ```{r, message=FALSE, warning=FALSE}
 library(pattern.nlp)
 library(googleVis)
 library(plotly)
 ```
 
-The data comes from a survey. Column names are simplified.
+The data comes from an online survey among students of the course [Smart Industry](https://witusj.github.io/MinorSI/) at the [HAN](https://www.han.nl/international/english/). After the data has been read the column names are simplified.
 ```{r, message=FALSE, warning=FALSE}
 rawData <- read.csv("survey.csv", stringsAsFactors = FALSE)
 newNames <- c(
@@ -29,7 +31,10 @@ newNames <- c(
 colnames(rawData) <- newNames
 ```
 
-Sentiment data is generated.
+Now the data is ready to be analysed for sentiment. Two parameters are calculated:
+
+- Subjectivity
+- Polarity
 ```{r, message=FALSE, warning=FALSE}
 ## Function reading text vector. Returns sentiment data frame
 read_sentiments <- function(vector, label) {
@@ -53,7 +58,7 @@ for (m in 2:dim(rawData)[2]) {
 }
 ```
 
-The data is visualised.
+Now the data can be visualised using the `plotly` package.
 ```{r, message=FALSE, warning=FALSE}
 sentDF$id <- sapply(sentDF$id,function(x) gsub("\\. ","\\.<br>",as.character(x)))
 
