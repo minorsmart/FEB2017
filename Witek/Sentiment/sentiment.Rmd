@@ -1,0 +1,75 @@
+---
+title: "Sentiment Analysis"
+output: html_document
+---
+
+
+Load necessary packages. For pattern.nlp you need Python (version below 3.0) installed on your system with the `pattern` library.
+```{r}
+library(pattern.nlp)
+library(googleVis)
+library(plotly)
+```
+
+The data comes from a survey. Column names are simplified.
+```{r}
+rawData <- read.csv("survey.csv", stringsAsFactors = FALSE)
+newNames <- c(
+  "Verwachtingen",
+  "Studiebelasting",
+  "Verbanden",
+  "Pluspunten",
+  "Activiteiten",
+  "Activeren",
+  "Bijdrage"
+)
+colnames(rawData) <- newNames
+```
+
+Sentiment data is generated.
+```{r}
+## Function reading text vector. Returns sentiment data frame
+read_sentiments <- function(vector, label) {
+  
+  tempDF <- NULL
+  
+  for (n in vector) {
+    x <- pattern_sentiment(n, language = "dutch")
+    x <- cbind(x, label)
+    tempDF <- rbind(tempDF, x)
+    
+  }
+  return(tempDF)
+}
+
+sentDF <- NULL
+
+for (m in 2:dim(rawData)[2]) {
+  x <- read_sentiments(rawData[,m], newNames[m-1])
+  sentDF <- rbind(sentDF, x)
+}
+```
+
+The data is visualised.
+```{r}
+sentDF$id <- sapply(sentDF$id,function(x) gsub("\\. ","\\.<br>",as.character(x)))
+
+pal <- rainbow(dim(rawData)[2]-1)
+f <- list(
+  family = "Courier New, monospace",
+  size = 18,
+  color = "#7f7f7f"
+)
+x <- list(
+  title = "Polariteit (neg / pos)",
+  titlefont = f
+)
+y <- list(
+  title = "Subjectiviteit",
+  titlefont = f
+)
+plot_ly(sentDF, x = sentDF$polarity, y = sentDF$subjectivity, text = paste("Tekst: ", sentDF$id),
+        mode = "markers", marker = list(size = 20), color = sentDF$label, colors = pal) %>%
+  layout(autosize = F, width = 1000, height = 800, xaxis = x, yaxis = y)
+```
+
