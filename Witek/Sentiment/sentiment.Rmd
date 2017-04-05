@@ -7,7 +7,7 @@ always_allow_html: default
 ---
 
 
-Load necessary packages. For pattern.nlp you need Python (version below 3.0) installed on your system with the `pattern` library.
+Load necessary packages. For [pattern.nlp](http://www.bnosac.be/index.php/blog/54-sentiment-analysis-and-parts-of-speech-tagging-in-dutch-french-english-german-spanish-italian) you need Python (version below 3.0) installed on your system with the `pattern` library. 
 ```{r, message=FALSE, warning=FALSE}
 library(pattern.nlp)
 library(googleVis)
