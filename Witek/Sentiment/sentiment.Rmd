@@ -9,7 +9,7 @@ always_allow_html: default
 
 This analysis is inspired by this [article](http://www.bnosac.be/index.php/blog/54-sentiment-analysis-and-parts-of-speech-tagging-in-dutch-french-english-german-spanish-italian).
 
-First load the necessary packages. For [pattern.nlp](https://github.com/bnosac/pattern.nlp) you need Python (version below 3.0) installed on your system with the `pattern` library. In my case I got an 'No module named pattern.db' error. I solved this by manually copying the downloaded `pattern` folder into the Python `site-packages' folder.
+First load the necessary packages. For [pattern.nlp](https://github.com/bnosac/pattern.nlp) you need Python (version below 3.0) installed on your system with the `pattern` library. In my case I got a 'No module named pattern.db' error. I solved this by manually copying the downloaded `pattern` folder into the Python `site-packages` folder.
 ```{r, message=FALSE, warning=FALSE}
 library(pattern.nlp)
 library(googleVis)
