@@ -2,8 +2,9 @@ require(RoogleVision)
 require(googleAuthR)
 
 ### plugin your credentials
-options("googleAuthR.client_id" = "225248482380-rm0qr7dssd9edfeeo0v37dpq0b5m72bf.apps.googleusercontent.com")
-options("googleAuthR.client_secret" = "bVim4OgRqwQIVY4deucK2G4O")
+##options("googleAuthR.client_id" = "225248482380-rm0qr7dssd9edfeeo0v37dpq0b5m72bf.apps.googleusercontent.com")
+##options("googleAuthR.client_secret" = "bVim4OgRqwQIVY4deucK2G4O")
+options("googleAuthR.key" = "AIzaSyCVJguLEJuv4tmXvxG0ICpTRdzwoOgnmXA")
 
 ## use the fantastic Google Auth R package
 ### define scope!
@@ -15,3 +16,4 @@ googleAuthR::gar_auth()
 # o <- getGoogleVisionResponse("brandlogos.png")
 # o <- getGoogleVisionResponse(imagePath="brandlogos.png", feature="LOGO_DETECTION", numResults=4)
 getGoogleVisionResponse("blikje.jpg")
+getGoogleVisionResponse("beker.jpg")
