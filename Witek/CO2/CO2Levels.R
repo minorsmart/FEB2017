@@ -1,0 +1,27 @@
+library(forecast)
+library(ggplot2)
+library(rvest)
+library(imputeTS)
+library(dplyr)
+library(reshape)
+
+# ETS forecasts
+USAccDeaths %>%
+  ets %>%
+  forecast %>%
+  autoplot
+ggseasonplot(co2, polar=TRUE)
+
+co2Data <- read_html("https://www.co2.earth/monthly-co2")
+co2DF <- co2Data %>%
+  html_nodes("table") %>%
+  .[[3]] %>%
+  html_table(header=TRUE)
+
+co2DF <- melt(co2DF, id="Year")
+co2DF <- arrange(co2DF, Year, variable)
+
+co2TS <- ts(co2DF[,3], start=c(1958,1), end = c(2017,12), frequency = 12)
+ggseasonplot(co2TS, polar=TRUE)
+ggseasonplot(co2TS, polar=FALSE)
+
