@@ -39,7 +39,7 @@ ui <- miniPage(
   
 )
 
-# Define server logic required to draw a histogram
+# Define server
 server <- function(input, output) {
    
   #This function is repsonsible for loading in the selected file
