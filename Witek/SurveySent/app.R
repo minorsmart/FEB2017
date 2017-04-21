@@ -1,27 +1,43 @@
 library(shiny)
-library(syuzhet)
+library(miniUI)
 library(plotly)
+library(ggplot2)
+library(ggthemes)
 source("functions.R")
 
-# Define UI for application that draws a histogram
-ui<- shinyUI(pageWithSidebar(
-  headerPanel("CSV File Upload Demo"),
-  
-  sidebarPanel(
-    #Selector for file upload
-    fileInput('datafile', 'Choose CSV file',
-              accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+# Define UI
+ui <- miniPage(
+  headerPanel("EIB Survey"),
+  gadgetTitleBar("EIB Survey Sentiment Analysis"),
+  miniTabstripPanel(
+    miniTabPanel("Upload", icon = icon("upload"),
+                 miniContentPanel(
+                   #Selector for file upload
+                   fileInput('datafile', 'Choose CSV file',
+                             accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+                   
+                   #The action button prevents an action firing before we're ready
+                   actionButton("getsent", "Get sentiments"),
+                   tags$hr(),
+                   DT::dataTableOutput("filetable")
+                   
+                 )
+    ),
+    miniTabPanel("Visualization", icon = icon("line-chart"),
+                 miniContentPanel(padding = 0,
+                                  plotlyOutput("plot")
+                 )
+                 
+    ),
+    miniTabPanel("Data", icon = icon("table"),
+                 miniContentPanel(
+                   DT::dataTableOutput("senttable")
+                 )
+    )
     
-    #The action button prevents an action firing before we're ready
-    actionButton("getgeo", "Get survey data")
-    
-  ),
-  mainPanel(
-    tableOutput("filetable"),
-    tableOutput("senttable"),
-    plotlyOutput("plot")
   )
-))
+  
+)
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -43,17 +59,21 @@ server <- function(input, output) {
   })
   
   #This previews the CSV data file
-  output$filetable <- renderTable({
+  output$filetable <- DT::renderDataTable({
     filedata()
   })
   
-  output$senttable <- renderTable({
-    if (input$getgeo == 0) return(NULL)
+  output$senttable <- DT::renderDataTable({
+    if (input$getsent == 0) return(NULL)
     survdata()
   })
   
   output$plot <- renderPlotly({
-    plot_ly(survdata(), x = ~Category, y = ~Sentiment, color = ~Category)
+    if (input$getsent == 0) return(NULL)
+    {
+      plot_ly(survdata(), type = "scatter", x = ~Category, y = ~Sentiment, color = ~ID,
+              marker = list(size = 30), text = ~paste("'",Response,"'"), showlegend = FALSE)
+    }
   })
 }
 
