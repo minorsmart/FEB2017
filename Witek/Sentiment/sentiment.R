@@ -40,6 +40,6 @@ sentDF$id <- sapply(sentDF$id,function(x) gsub("\\. ","\\.<br>",as.character(x))
 
 pal <- rainbow(dim(rawData)[2]-1)
 plot_ly(sentDF, x = sentDF$polarity, y = sentDF$subjectivity, text = paste("Tekst: ", sentDF$id),
-        mode = "markers", color = sentDF$label, colors = pal) %>%
-  layout(autosize = F, width = 500, height = 500)
+        mode = "markers", color = sentDF$label, marker = list(size = 15), colors = pal, width = 700, height = 400) %>%
+  layout(autosize = T)
 
