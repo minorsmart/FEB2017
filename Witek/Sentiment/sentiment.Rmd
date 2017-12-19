@@ -12,13 +12,13 @@ This analysis is inspired by this [article](http://www.bnosac.be/index.php/blog/
 First load the necessary packages. For [pattern.nlp](https://github.com/bnosac/pattern.nlp) you need Python (version below 3.0) installed on your system with the `pattern` library. In my case I got a 'No module named pattern.db' error. I solved this by manually copying the downloaded `pattern` folder into the Python `site-packages` folder.
 ```{r, message=FALSE, warning=FALSE}
 library(pattern.nlp)
-library(googleVis)
+library(DT)
 library(plotly)
 ```
 
 The data comes from an online survey among students of the course [Smart Industry](https://witusj.github.io/MinorSI/) at the [HAN](https://www.han.nl/international/english/). After the data has been read the column names are simplified.
 ```{r, message=FALSE, warning=FALSE}
-rawData <- read.csv("survey.csv", stringsAsFactors = FALSE)
+rawData <- read.csv("survey17.csv", stringsAsFactors = FALSE)
 newNames <- c(
   "Verwachtingen",
   "Studiebelasting",
@@ -59,13 +59,19 @@ for (m in 2:dim(rawData)[2]) {
 ```
 
 Now the data can be visualised using the `plotly` package.
+
+## Quarterly Results {.tabset}
+
+### Chart 
+
 ```{r, message=FALSE, warning=FALSE}
 sentDF$id <- sapply(sentDF$id,function(x) gsub("\\. ","\\.<br>",as.character(x)))
+sentDF$polarity <- round(sentDF$polarity, 2)
 
 pal <- rainbow(dim(rawData)[2]-1)
 f <- list(
   family = "Courier New, monospace",
-  size = 18,
+  size = 14,
   color = "#7f7f7f"
 )
 x <- list(
@@ -76,8 +82,17 @@ y <- list(
   title = "Subjectiviteit",
   titlefont = f
 )
-plot_ly(sentDF, x = sentDF$polarity, y = sentDF$subjectivity, text = paste("Tekst: ", sentDF$id),
-        mode = "markers", marker = list(size = 20), color = sentDF$label, colors = pal) %>%
+plot_ly(sentDF, x = sentDF$polarity, y = sentDF$subjectivity, text = paste("Tekst: ", sentDF$id), hoverinfo = "text", mode = "markers", marker = list(size = 20), color = sentDF$label, colors = pal) %>%
   layout(autosize = F, width = 1000, height = 800, xaxis = x, yaxis = y)
+
+```
+
+
+### Data
+
+```{r}
+datatable(sentDF[, c("label", "id", "polarity")], filter = 'top', options = list(
+  pageLength = 25, autoWidth = TRUE
+))
 ```
 
