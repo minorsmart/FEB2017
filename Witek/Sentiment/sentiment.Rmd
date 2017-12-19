@@ -18,7 +18,7 @@ library(plotly)
 
 The data comes from an online survey among students of the course [Smart Industry](https://witusj.github.io/MinorSI/) at the [HAN](https://www.han.nl/international/english/). After the data has been read the column names are simplified.
 ```{r, message=FALSE, warning=FALSE}
-rawData <- read.csv("survey17.csv", stringsAsFactors = FALSE)
+rawData <- read.csv("survey.csv", stringsAsFactors = FALSE)
 newNames <- c(
   "Verwachtingen",
   "Studiebelasting",
@@ -60,7 +60,7 @@ for (m in 2:dim(rawData)[2]) {
 
 Now the data can be visualised using the `plotly` package.
 
-## Quarterly Results {.tabset}
+## Sentimentmetingen {.tabset}
 
 ### Chart 
 
